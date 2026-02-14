@@ -7,7 +7,6 @@ import { useGameStore } from '@/lib/store';
 export function AssetHistoryChart() {
     const { assetHistory } = useGameStore();
 
-    // If no history, show some placeholder or start point
     const data = assetHistory.length > 0 ? assetHistory : [
         { date: new Date().toISOString(), totalAssets: 10000000 }
     ];
@@ -19,7 +18,7 @@ export function AssetHistoryChart() {
     }));
 
     return (
-        <Card className="col-span-1 lg:col-span-2">
+        <Card className="col-span-1 lg:col-span-2 bg-white border-slate-100 shadow-sm">
             <CardHeader>
                 <CardTitle>資産推移</CardTitle>
             </CardHeader>
@@ -28,11 +27,11 @@ export function AssetHistoryChart() {
                     <AreaChart data={formattedData}>
                         <defs>
                             <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
                                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                         <XAxis dataKey="dateStr" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
                         <YAxis
                             tickFormatter={(value) => `¥${(value / 10000).toFixed(0)}万`}
@@ -43,8 +42,9 @@ export function AssetHistoryChart() {
                         <Tooltip
                             formatter={(value: number) => `¥${value.toLocaleString()}`}
                             labelFormatter={(label) => label}
+                            contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                         />
-                        <Area type="monotone" dataKey="value" stroke="#3b82f6" fillOpacity={1} fill="url(#colorValue)" strokeWidth={2} />
+                        <Area type="monotone" dataKey="value" stroke="#3b82f6" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
                     </AreaChart>
                 </ResponsiveContainer>
             </CardContent>

@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export function Card({ className, children }: { className?: string, children: React.ReactNode }) {
     return (
-        <div className={cn("bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm", className)}>
+        <div className={cn("bg-white rounded-2xl border border-slate-200 shadow-sm", className)}>
             {children}
         </div>
     )
@@ -19,7 +19,7 @@ export function CardHeader({ className, children }: { className?: string, childr
 }
 
 export function CardTitle({ className, children }: { className?: string, children: React.ReactNode }) {
-    return <h3 className={cn("text-lg font-semibold text-slate-900 dark:text-white", className)}>{children}</h3>
+    return <h3 className={cn("text-lg font-bold text-slate-900", className)}>{children}</h3>
 }
 
 export function CardContent({ className, children }: { className?: string, children: React.ReactNode }) {

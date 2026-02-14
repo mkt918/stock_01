@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import { LayoutDashboard, TrendingUp, PieChart, Settings, BookOpen } from 'lucide-react';
+import { LayoutDashboard, TrendingUp, PieChart, BookOpen } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 const navItems = [
@@ -15,12 +14,12 @@ export function Sidebar() {
     const pathname = usePathname();
 
     return (
-        <aside className="w-64 bg-slate-900 text-white h-screen fixed left-0 top-0 flex flex-col border-r border-slate-800 shadow-xl z-50">
+        <aside className="w-64 bg-white text-slate-700 h-screen fixed left-0 top-0 flex flex-col border-r border-slate-200 shadow-sm z-50">
             <div className="p-6">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                    StockLearner
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    株式学習ゲーム
                 </h1>
-                <p className="text-xs text-slate-400 mt-1">中高生向け株式学習</p>
+                <p className="text-xs text-slate-400 mt-1">中高生向け金融リテラシー</p>
             </div>
 
             <nav className="flex-1 px-4 space-y-2 mt-4">
@@ -34,22 +33,22 @@ export function Sidebar() {
                             className={twMerge(
                                 "flex items-center px-4 py-3 rounded-xl transition-all duration-200 group",
                                 isActive
-                                    ? "bg-blue-600 shadow-lg shadow-blue-900/50 text-white"
-                                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                                    ? "bg-blue-50 text-blue-600 font-bold shadow-sm"
+                                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                             )}
                         >
-                            <Icon size={20} className={twMerge("mr-3", isActive ? "text-white" : "text-slate-500 group-hover:text-white")} />
-                            <span className="font-medium">{item.name}</span>
+                            <Icon size={20} className={twMerge("mr-3", isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600")} />
+                            <span className={twMerge(isActive ? "font-bold" : "font-medium")}>{item.name}</span>
                         </Link>
                     );
                 })}
             </nav>
 
-            <div className="p-4 border-t border-slate-800">
-                <div className="bg-slate-800/50 rounded-lg p-3">
-                    <p className="text-xs text-slate-500 mb-1">Total Assets</p>
-                    {/* We will connect this to store later, for now static or client side only */}
-                    <div className="h-2 w-20 bg-slate-700 rounded animate-pulse"></div>
+            <div className="p-4 border-t border-slate-100">
+                <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-xs text-slate-500 mb-1">総資産 (概算)</p>
+                    {/* Client-side visual placeholder */}
+                    <div className="h-2 w-20 bg-slate-200 rounded animate-pulse"></div>
                 </div>
             </div>
         </aside>
