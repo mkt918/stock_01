@@ -40,7 +40,7 @@ export function AssetHistoryChart() {
                             domain={['auto', 'auto']}
                         />
                         <Tooltip
-                            formatter={(value: number) => `¥${value.toLocaleString()}`}
+                            formatter={(value: any) => `¥${value.toLocaleString()}`}
                             labelFormatter={(label) => label}
                             contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                         />

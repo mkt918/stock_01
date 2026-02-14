@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Stock } from '@/lib/types';
 import { useGameStore } from '@/lib/store';
 import { X } from 'lucide-react';
+import { simulatePrice } from '@/lib/simulation';
 
 interface TradeModalProps {
     stock: Stock;
@@ -26,17 +27,12 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
 
     const fetchPrice = async () => {
         setLoading(true);
-        try {
-            const res = await fetch(`/api/price?code=${stock.code}`);
-            const data = await res.json();
-            if (data.price) {
-                setCurrentPrice(data.price);
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
+        // Simulate API delay slightly for realism
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const priceData = simulatePrice(stock.code);
+        setCurrentPrice(priceData.price);
+        setLoading(false);
     };
 
     if (!isOpen) return null;

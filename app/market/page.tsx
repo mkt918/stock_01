@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Stock } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/Card';
-import { Search, TrendingUp, TrendingDown, RefreshCcw, ExternalLink } from 'lucide-react';
+import { Search, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
 import { TradeModal } from '@/components/Market/TradeModal';
+import { POPULAR_STOCKS } from '@/lib/constants';
+import { simulatePrice } from '@/lib/simulation';
 
 export default function MarketPage() {
     const [stocks, setStocks] = useState<Stock[]>([]);
@@ -19,18 +21,14 @@ export default function MarketPage() {
     const fetchStocks = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/edinet?type=list');
-            const list: Stock[] = await res.json();
+            // 1. Get List directly from constants (Client-side)
+            const list = POPULAR_STOCKS;
 
-            const stockWithPrices = await Promise.all(list.map(async (s) => {
-                try {
-                    const pRes = await fetch(`/api/price?code=${s.code}`);
-                    const pData = await pRes.json();
-                    return { ...s, ...pData };
-                } catch (e) {
-                    return s;
-                }
-            }));
+            // 2. Simulate prices
+            const stockWithPrices = list.map(s => {
+                const priceData = simulatePrice(s.code);
+                return { ...s, ...priceData };
+            });
 
             setStocks(stockWithPrices);
         } catch (e) {
