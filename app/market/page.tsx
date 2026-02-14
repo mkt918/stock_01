@@ -21,14 +21,30 @@ export default function MarketPage() {
     const fetchStocks = async () => {
         setLoading(true);
         try {
-            // 1. Get List directly from constants (Client-side)
             const list = POPULAR_STOCKS;
 
-            // 2. Simulate prices
-            const stockWithPrices = list.map(s => {
-                const priceData = simulatePrice(s.code, s.basePrice ?? 1000);
-                return { ...s, ...priceData };
+            // Fetch real prices for each stock
+            const stockPromises = list.map(async (s) => {
+                try {
+                    const res = await fetch(`/api/stocks?code=${s.code}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        return {
+                            ...s,
+                            price: data.regularMarketPrice,
+                            change: data.regularMarketChange,
+                            changePercent: data.regularMarketChangePercent
+                        };
+                    }
+                } catch (err) {
+                    console.error(`Failed to fetch ${s.code}`, err);
+                }
+                // Fallback to simulation if fetch fails
+                const simulated = simulatePrice(s.code, s.basePrice ?? 1000);
+                return { ...s, ...simulated };
             });
+
+            const stockWithPrices = await Promise.all(stockPromises);
 
             setStocks(stockWithPrices);
         } catch (e) {

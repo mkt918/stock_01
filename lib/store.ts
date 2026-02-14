@@ -14,6 +14,7 @@ interface GameState {
     sellStock: (stock: Stock, quantity: number) => void;
     resetGame: () => void;
     recordHistory: () => void; // Call this periodically or on page load to track assets over time
+    updatePrices: () => Promise<void>; // Fetch latest prices for all holdings
 }
 
 export const useGameStore = create<GameState>()(
@@ -124,26 +125,55 @@ export const useGameStore = create<GameState>()(
 
             recordHistory: () => {
                 const { cash, holdings, assetHistory } = get();
-                // Calculate current stock value
-                // Note: This relies on 'currentPrice' in holdings being up to date.
-                // In a real app, we'd refetch prices here.
-                // For now, we use the last known price.
                 const stockValue = holdings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
                 const totalAssets = cash + stockValue;
 
-                const today = new Date().toISOString().split('T')[0];
-                // Only add if last entry is not today? Or just append.
-                // Let's just append for every transaction for granular history in this game.
-                // Or better, distinct daily snapshot.
-
                 const newEntry: AssetHistory = {
-                    date: new Date().toISOString(), // Use full timestamp for intraday tracking
+                    date: new Date().toISOString(),
                     totalAssets,
                     cash,
                     stockValue
                 };
 
                 set({ assetHistory: [...assetHistory, newEntry] });
+            },
+
+            updatePrices: async () => {
+                const { holdings } = get();
+                if (holdings.length === 0) return;
+
+                try {
+                    const pricePromises = holdings.map(async (item) => {
+                        const response = await fetch(`/api/stocks?code=${item.code}`);
+                        if (response.ok) {
+                            const data = await response.json();
+                            return { code: item.code, price: data.regularMarketPrice };
+                        }
+                        return null;
+                    });
+
+                    const results = await Promise.all(pricePromises);
+
+                    let newHoldings = [...holdings];
+                    let updated = false;
+
+                    results.forEach(res => {
+                        if (res) {
+                            const index = newHoldings.findIndex(h => h.code === res.code);
+                            if (index !== -1 && newHoldings[index].currentPrice !== res.price) {
+                                newHoldings[index] = { ...newHoldings[index], currentPrice: res.price };
+                                updated = true;
+                            }
+                        }
+                    });
+
+                    if (updated) {
+                        set({ holdings: newHoldings });
+                        get().recordHistory(); // Record history after price update
+                    }
+                } catch (error) {
+                    console.error("Failed to update prices:", error);
+                }
             }
         }),
         {

@@ -4,6 +4,7 @@ import { useGameStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { AssetHistoryChart } from '@/components/Dashboard/AssetHistoryChart';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { LatestDisclosures } from '@/components/Dashboard/LatestDisclosures';
 import Link from 'next/link';
 import { ArrowRight, Wallet, TrendingUp, History } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -11,12 +12,19 @@ import { useEffect, useState } from 'react';
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function Dashboard() {
-    const { cash, holdings, resetGame } = useGameStore();
+    const { cash, holdings, resetGame, updatePrices } = useGameStore();
 
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
         setMounted(true);
-    }, []);
+        updatePrices(); // Fetch immediately on mount
+
+        const interval = setInterval(() => {
+            updatePrices();
+        }, 60000); // Update every minute
+
+        return () => clearInterval(interval);
+    }, [updatePrices]);
 
     if (!mounted) return null;
 
@@ -177,8 +185,11 @@ export default function Dashboard() {
                             </Link>
                         </div>
                     </CardContent>
+                    </CardContent>
                 </Card>
             </div>
-        </div>
+            
+            <LatestDisclosures />
+        </div >
     );
 }
