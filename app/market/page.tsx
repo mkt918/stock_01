@@ -26,7 +26,7 @@ export default function MarketPage() {
 
             // 2. Simulate prices
             const stockWithPrices = list.map(s => {
-                const priceData = simulatePrice(s.code);
+                const priceData = simulatePrice(s.code, s.basePrice ?? 1000);
                 return { ...s, ...priceData };
             });
 

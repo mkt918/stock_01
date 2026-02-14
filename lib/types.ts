@@ -1,6 +1,7 @@
 export interface Stock {
   code: string;
   name: string;
+  basePrice?: number;
   price?: number;
   change?: number;
   changePercent?: number;

@@ -1,11 +1,16 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useGameStore } from '@/lib/store';
 
 export function AssetHistoryChart() {
     const { assetHistory } = useGameStore();
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => { setMounted(true); }, []);
+
+    if (!mounted) return null;
 
     const data = assetHistory.length > 0 ? assetHistory : [
         { date: new Date().toISOString(), totalAssets: 10000000 }
