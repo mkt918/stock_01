@@ -30,7 +30,7 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
         // Simulate API delay slightly for realism
         await new Promise(resolve => setTimeout(resolve, 300));
 
-        const priceData = simulatePrice(stock.code);
+        const priceData = simulatePrice(stock.code, stock.basePrice ?? 1000);
         setCurrentPrice(priceData.price);
         setLoading(false);
     };

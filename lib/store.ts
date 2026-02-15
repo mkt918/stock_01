@@ -143,33 +143,29 @@ export const useGameStore = create<GameState>()(
                 if (holdings.length === 0) return;
 
                 try {
-                    const pricePromises = holdings.map(async (item) => {
-                        const response = await fetch(`/api/stocks?code=${item.code}`);
-                        if (response.ok) {
-                            const data = await response.json();
-                            return { code: item.code, price: data.regularMarketPrice };
-                        }
-                        return null;
-                    });
+                    // GitHub Pages base path support
+                    const response = await fetch('/stock_01/data/stocks.json');
+                    if (response.ok) {
+                        const data: Record<string, any> = await response.json();
 
-                    const results = await Promise.all(pricePromises);
+                        let newHoldings = [...holdings];
+                        let updated = false;
 
-                    let newHoldings = [...holdings];
-                    let updated = false;
-
-                    results.forEach(res => {
-                        if (res) {
-                            const index = newHoldings.findIndex(h => h.code === res.code);
-                            if (index !== -1 && newHoldings[index].currentPrice !== res.price) {
-                                newHoldings[index] = { ...newHoldings[index], currentPrice: res.price };
-                                updated = true;
+                        newHoldings = newHoldings.map(item => {
+                            if (data[item.code]) {
+                                const newPrice = data[item.code].price;
+                                if (item.currentPrice !== newPrice) {
+                                    updated = true;
+                                    return { ...item, currentPrice: newPrice };
+                                }
                             }
-                        }
-                    });
+                            return item;
+                        });
 
-                    if (updated) {
-                        set({ holdings: newHoldings });
-                        get().recordHistory(); // Record history after price update
+                        if (updated) {
+                            set({ holdings: newHoldings });
+                            get().recordHistory();
+                        }
                     }
                 } catch (error) {
                     console.error("Failed to update prices:", error);

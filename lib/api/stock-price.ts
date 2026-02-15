@@ -14,14 +14,14 @@ export async function getStockPrice(code: string): Promise<StockPriceData | null
         // Yahoo Finance uses .T for Tokyo Stock Exchange
         const symbol = code.endsWith('.T') ? code : `${code}.T`;
 
-        const quote = await yahooFinance.quote(symbol);
+        const quote = await yahooFinance.quote(symbol) as any;
 
         if (!quote) {
             return null;
         }
 
         return {
-            symbol: quote.symbol,
+            symbol: quote.symbol || symbol,
             regularMarketPrice: quote.regularMarketPrice || 0,
             regularMarketChange: quote.regularMarketChange || 0,
             regularMarketChangePercent: quote.regularMarketChangePercent || 0,

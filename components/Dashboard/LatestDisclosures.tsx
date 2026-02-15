@@ -19,18 +19,25 @@ export function LatestDisclosures() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (holdings.length === 0) return;
         fetchDisclosures();
-    }, [holdings.length]); // Re-fetch if holdings change (length is a simple proxy)
+    }, [holdings.length]);
 
     const fetchDisclosures = async () => {
         setLoading(true);
         try {
-            const codes = holdings.map(h => h.code).join(',');
-            const res = await fetch(`/api/edinet?codes=${codes}`);
+            const res = await fetch('/stock_01/data/edinet.json');
             if (res.ok) {
                 const data = await res.json();
-                setDisclosures(data);
+
+                if (holdings.length === 0) {
+                    setDisclosures(data.slice(0, 5)); // Show some default recent docs if none held
+                } else {
+                    const codes = holdings.map(h => h.code);
+                    const filtered = data.filter((doc: any) =>
+                        doc.secCode && codes.some(c => doc.secCode.startsWith(c))
+                    );
+                    setDisclosures(filtered.length > 0 ? filtered : data.slice(0, 5));
+                }
             }
         } catch (error) {
             console.error("Failed to fetch disclosures", error);
@@ -39,14 +46,12 @@ export function LatestDisclosures() {
         }
     };
 
-    if (holdings.length === 0) return null;
-
     return (
         <Card className="bg-white border-slate-100 shadow-sm mt-6">
             <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-lg flex items-center gap-2">
                     <FileText className="h-5 w-5 text-slate-500" />
-                    保有銘柄の最新開示情報 (EDINET API)
+                    市場の最新開示情報 (EDINET API連携)
                 </CardTitle>
                 <button
                     onClick={fetchDisclosures}
@@ -80,7 +85,7 @@ export function LatestDisclosures() {
                     </div>
                 ) : (
                     <p className="text-sm text-slate-400 text-center py-4">
-                        直近の開示情報はありません
+                        開示情報はありません
                     </p>
                 )}
             </CardContent>

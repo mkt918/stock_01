@@ -1,0 +1,17 @@
+{
+    "7203": {
+        "price": 3770,
+        "change": 10,
+        "changePercent": 0.27
+    },
+    "6758": {
+        "price": 2800,
+        "change": -5,
+        "changePercent": -0.18
+    },
+    "9984": {
+        "price": 10300,
+        "change": 50,
+        "changePercent": 0.49
+    }
+}

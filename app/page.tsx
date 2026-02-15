@@ -185,10 +185,9 @@ export default function Dashboard() {
                             </Link>
                         </div>
                     </CardContent>
-                    </CardContent>
                 </Card>
             </div>
-            
+
             <LatestDisclosures />
         </div >
     );
