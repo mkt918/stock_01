@@ -1,12 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { useGameStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Package, TrendingUp, TrendingDown, BookOpen, Clock, Tag } from 'lucide-react';
-import { PortfolioItem, Transaction } from '@/lib/types';
+import { Package, TrendingUp, TrendingDown, BookOpen, Clock, Tag, ShoppingCart } from 'lucide-react';
+import { PortfolioItem, Transaction, Stock } from '@/lib/types';
+import { TradeModal } from '@/components/Market/TradeModal';
 
 export default function PortfolioPage() {
     const { holdings, transactions, cash } = useGameStore();
+    const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
 
     const stockValue = holdings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
     const totalAssets = cash + stockValue;
@@ -39,25 +42,48 @@ export default function PortfolioPage() {
                                         <thead>
                                             <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                                 <th className="px-6 py-4">銘柄</th>
+                                                <th className="px-6 py-4">構成比</th>
                                                 <th className="px-6 py-4">保有数</th>
-                                                <th className="px-6 py-4">平均単価 / 現在値</th>
                                                 <th className="px-6 py-4">評価損益</th>
+                                                <th className="px-6 py-4 text-center">操作</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
                                             {holdings.map((item) => {
+                                                const itemValue = item.currentPrice * item.quantity;
+                                                const ratio = totalAssets > 0 ? (itemValue / totalAssets) * 100 : 0;
                                                 const pl = (item.currentPrice - item.averagePrice) * item.quantity;
                                                 const plPercent = ((item.currentPrice / item.averagePrice) - 1) * 100;
+
+                                                const stockForModal: Stock = {
+                                                    code: item.code,
+                                                    name: item.name,
+                                                    price: item.currentPrice,
+                                                    basePrice: item.averagePrice, // Using avg price as base for simulation fallback
+                                                    change: 0,
+                                                    changePercent: 0
+                                                };
+
                                                 return (
-                                                    <tr key={item.code} className="hover:bg-slate-50/50 transition-colors">
+                                                    <tr key={item.code} className="hover:bg-slate-50/50 transition-colors group">
                                                         <td className="px-6 py-5">
                                                             <span className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-600 mb-1 inline-block">{item.code}</span>
                                                             <div className="font-bold text-slate-900">{item.name}</div>
                                                         </td>
-                                                        <td className="px-6 py-5 font-mono text-slate-700">{item.quantity} 株</td>
-                                                        <td className="px-6 py-5 font-mono">
-                                                            <div className="text-xs text-slate-400">買: ¥{Math.round(item.averagePrice).toLocaleString()}</div>
-                                                            <div className="text-slate-900 font-bold">現: ¥{item.currentPrice.toLocaleString()}</div>
+                                                        <td className="px-6 py-5">
+                                                            <div className="flex flex-col">
+                                                                <span className="font-mono font-bold text-slate-700">{ratio.toFixed(1)}%</span>
+                                                                <div className="w-16 h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                                                                    <div
+                                                                        className="h-full bg-blue-500 rounded-full"
+                                                                        style={{ width: `${ratio}%` }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-5">
+                                                            <div className="font-mono text-slate-700 font-bold">{item.quantity.toLocaleString()} <span className="text-[10px] text-slate-400">株</span></div>
+                                                            <div className="text-[10px] text-slate-400">@¥{Math.round(item.averagePrice).toLocaleString()}</div>
                                                         </td>
                                                         <td className="px-6 py-5">
                                                             <div className={`font-mono font-bold flex items-center ${pl >= 0 ? 'text-red-500' : 'text-green-500'}`}>
@@ -67,6 +93,15 @@ export default function PortfolioPage() {
                                                             <div className={`text-xs font-bold ${pl >= 0 ? 'text-red-400' : 'text-green-400'}`}>
                                                                 {pl >= 0 ? '+' : ''}{plPercent.toFixed(2)}%
                                                             </div>
+                                                        </td>
+                                                        <td className="px-6 py-5 text-center">
+                                                            <button
+                                                                onClick={() => setSelectedStock(stockForModal)}
+                                                                className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm active:scale-95 flex items-center space-x-2 mx-auto"
+                                                            >
+                                                                <ShoppingCart size={16} />
+                                                                <span className="text-xs font-bold">売買</span>
+                                                            </button>
                                                         </td>
                                                     </tr>
                                                 );
@@ -142,10 +177,12 @@ export default function PortfolioPage() {
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-slate-400">現金</span>
                                     <span className="font-mono font-bold">¥{cash.toLocaleString()}</span>
+                                    <span className="text-[10px] text-slate-500 italic">({totalAssets > 0 ? ((cash / totalAssets) * 100).toFixed(1) : 0}%)</span>
                                 </div>
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-slate-400">株式評価額</span>
                                     <span className="font-mono font-bold">¥{stockValue.toLocaleString()}</span>
+                                    <span className="text-[10px] text-slate-500 italic">({totalAssets > 0 ? ((stockValue / totalAssets) * 100).toFixed(1) : 0}%)</span>
                                 </div>
                             </div>
                         </CardContent>
@@ -168,6 +205,14 @@ export default function PortfolioPage() {
                     </Card>
                 </div>
             </div>
+
+            {selectedStock && (
+                <TradeModal
+                    stock={selectedStock}
+                    isOpen={!!selectedStock}
+                    onClose={() => setSelectedStock(null)}
+                />
+            )}
         </div>
     );
 }
