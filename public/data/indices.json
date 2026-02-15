@@ -1,0 +1,23 @@
+{
+  "^GSPC": {
+    "name": "S&P 500",
+    "price": 5667.20,
+    "change": 23.11,
+    "changePercent": 0.4093,
+    "currency": "USD"
+  },
+  "^TPX": {
+    "name": "TOPIX",
+    "price": 2808.29,
+    "change": -12.43,
+    "changePercent": -0.4409,
+    "currency": "JPY"
+  },
+  "2559.T": {
+    "name": "全世界株式(オルカン)",
+    "price": 21830.0,
+    "change": 120.0,
+    "changePercent": 0.5523,
+    "currency": "JPY"
+  }
+}
