@@ -118,11 +118,16 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
                                 </p>
                             </div>
                             <div className="bg-blue-50/30 p-5 rounded-3xl border border-blue-100/50 text-center">
-                                <p className="text-[10px] uppercase font-bold text-blue-400 mb-1 tracking-tight">保有株数 / 平均単価</p>
-                                <p className="text-2xl font-black font-mono text-blue-600 leading-tight">
+                                <p className="text-[10px] uppercase font-bold text-blue-400 mb-1 tracking-tight">保有状況 (株数/評価額)</p>
+                                <p className="text-xl font-black font-mono text-blue-600 leading-tight">
                                     {ownedQuantity.toLocaleString()} <span className="text-xs">株</span>
                                 </p>
-                                {avgPrice > 0 && <p className="text-[10px] font-bold text-blue-400 mt-1">@¥{Math.round(avgPrice).toLocaleString()}</p>}
+                                {ownedQuantity > 0 && (
+                                    <p className="text-sm font-black text-blue-500 mt-1">
+                                        ¥{(ownedQuantity * currentPrice).toLocaleString()}
+                                    </p>
+                                )}
+                                {avgPrice > 0 && <p className="text-[10px] font-bold text-blue-300">@¥{Math.round(avgPrice).toLocaleString()}</p>}
                             </div>
                         </div>
 

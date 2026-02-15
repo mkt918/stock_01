@@ -44,6 +44,7 @@ export default function PortfolioPage() {
                                                 <th className="px-6 py-4">銘柄</th>
                                                 <th className="px-6 py-4">構成比</th>
                                                 <th className="px-6 py-4">保有数</th>
+                                                <th className="px-6 py-4">評価額</th>
                                                 <th className="px-6 py-4">評価損益</th>
                                                 <th className="px-6 py-4 text-center">操作</th>
                                             </tr>
@@ -59,7 +60,7 @@ export default function PortfolioPage() {
                                                     code: item.code,
                                                     name: item.name,
                                                     price: item.currentPrice,
-                                                    basePrice: item.averagePrice, // Using avg price as base for simulation fallback
+                                                    basePrice: item.averagePrice,
                                                     change: 0,
                                                     changePercent: 0
                                                 };
@@ -84,6 +85,10 @@ export default function PortfolioPage() {
                                                         <td className="px-6 py-5">
                                                             <div className="font-mono text-slate-700 font-bold">{item.quantity.toLocaleString()} <span className="text-[10px] text-slate-400">株</span></div>
                                                             <div className="text-[10px] text-slate-400">@¥{Math.round(item.averagePrice).toLocaleString()}</div>
+                                                        </td>
+                                                        <td className="px-6 py-5">
+                                                            <div className="font-mono font-black text-slate-900">¥{itemValue.toLocaleString()}</div>
+                                                            <div className="text-[10px] text-slate-400 font-medium">現: ¥{item.currentPrice.toLocaleString()}</div>
                                                         </td>
                                                         <td className="px-6 py-5">
                                                             <div className={`font-mono font-bold flex items-center ${pl >= 0 ? 'text-red-500' : 'text-green-500'}`}>
@@ -116,7 +121,7 @@ export default function PortfolioPage() {
                     {/* Stock Note (Transaction History) */}
                     <div className="space-y-4">
                         <div className="flex items-center space-x-2 px-2">
-                            <BookOpen className="h-6 w-6 text-purple-600" />
+                            < BookOpen className="h-6 w-6 text-purple-600" />
                             <h2 className="text-xl font-bold text-slate-800">株ノート (取引記録)</h2>
                         </div>
                         <div className="space-y-4">

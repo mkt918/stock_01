@@ -6,7 +6,7 @@ import { AssetHistoryChart } from '@/components/Dashboard/AssetHistoryChart';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { LatestDisclosures } from '@/components/Dashboard/LatestDisclosures';
 import Link from 'next/link';
-import { ArrowRight, Wallet, TrendingUp, History, RefreshCcw } from 'lucide-react';
+import { ArrowRight, Wallet, TrendingUp, TrendingDown, History, RefreshCcw } from 'lucide-react';
 import { useEffect, useState, useCallback } from 'react';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -17,10 +17,22 @@ export default function Dashboard() {
     const [mounted, setMounted] = useState(false);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [indices, setIndices] = useState<any>({});
 
     const handleRefresh = useCallback(async () => {
         setIsRefreshing(true);
         await updatePrices();
+
+        try {
+            const res = await fetch('/stock_01/data/indices.json');
+            if (res.ok) {
+                const data = await res.json();
+                setIndices(data);
+            }
+        } catch (e) {
+            console.warn("Failed to fetch indices");
+        }
+
         setLastUpdated(new Date());
         setIsRefreshing(false);
     }, [updatePrices]);
@@ -31,7 +43,7 @@ export default function Dashboard() {
 
         const interval = setInterval(() => {
             handleRefresh();
-        }, 60000); // 1分おきにブラウザ側のデータを更新
+        }, 60000);
 
         return () => clearInterval(interval);
     }, [handleRefresh]);
@@ -53,11 +65,11 @@ export default function Dashboard() {
         <div className="space-y-6">
             <div className="flex justify-between items-end">
                 <div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    <h1 className="text-3xl font-black bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent tracking-tight">
                         資産ダッシュボード
                     </h1>
                     <div className="flex items-center space-x-2 mt-1">
-                        <p className="text-slate-500">ようこそ、未来の投資家さん</p>
+                        <p className="text-slate-500 font-medium tracking-tight whitespace-nowrap overflow-hidden">ようこそ、未来の投資家さん</p>
                         {lastUpdated && (
                             <span className="text-[10px] bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full flex items-center space-x-1">
                                 <RefreshCcw size={10} className={isRefreshing ? 'animate-spin' : ''} />
@@ -76,11 +88,36 @@ export default function Dashboard() {
                     </button>
                     <button
                         onClick={() => { if (confirm('データをリセットしますか？')) resetGame() }}
-                        className="text-xs text-red-400 hover:text-red-600 hover:underline transition-colors"
+                        className="text-xs text-red-300 hover:text-red-500 transition-colors"
                     >
                         リセット
                     </button>
                 </div>
+            </div>
+
+            {/* Major Indices Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {Object.values(indices).length > 0 ? (
+                    Object.values(indices).map((idx: any) => (
+                        <div key={idx.name} className="bg-white/50 backdrop-blur-sm border border-slate-100 rounded-2xl p-4 shadow-sm flex justify-between items-center">
+                            <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{idx.name}</p>
+                                <p className="font-mono font-black text-slate-900">¥{idx.price.toLocaleString()}</p>
+                            </div>
+                            <div className={`text-right ${idx.change >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                <div className="flex items-center justify-end space-x-1 text-xs font-bold font-mono">
+                                    {idx.change >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                                    <span>{idx.changePercent.toFixed(2)}%</span>
+                                </div>
+                                <p className="text-[10px] font-mono opacity-70">
+                                    {idx.change > 0 ? '+' : ''}{idx.change.toLocaleString()}
+                                </p>
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-span-3 text-center py-4 text-slate-300 text-xs italic">市場指数を読み込み中...</div>
+                )}
             </div>
 
             {/* Asset Summary Cards */}

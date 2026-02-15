@@ -20,6 +20,12 @@ const POPULAR_STOCKS = [
     { code: '9983', name: 'ファーストリテイリング' }
 ];
 
+const MAJOR_INDICES = [
+    { code: '^GSPC', name: 'S&P 500' },
+    { code: '^TPX', name: 'TOPIX' },
+    { code: '2559.T', name: '全世界株式(オルカン)' }
+];
+
 async function fetchStocks() {
     console.log('Fetching stock prices...');
     const results = {};
@@ -36,6 +42,27 @@ async function fetchStocks() {
             }
         } catch (e) {
             console.error(`Failed for ${stock.code}: ${e.message}`);
+        }
+    }
+    return results;
+}
+
+async function fetchIndices() {
+    console.log('Fetching major indices...');
+    const results = {};
+    for (const index of MAJOR_INDICES) {
+        try {
+            const quote = await yahooFinance.quote(index.code);
+            if (quote) {
+                results[index.code] = {
+                    name: index.name,
+                    price: quote.regularMarketPrice,
+                    change: quote.regularMarketChange,
+                    changePercent: quote.regularMarketChangePercent
+                };
+            }
+        } catch (e) {
+            console.error(`Failed for ${index.code}: ${e.message}`);
         }
     }
     return results;
@@ -71,9 +98,11 @@ async function main() {
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
 
     const stocks = await fetchStocks();
+    const indices = await fetchIndices();
     const edinet = await fetchEdinet();
 
     fs.writeFileSync(path.join(dataDir, 'stocks.json'), JSON.stringify(stocks, null, 2));
+    fs.writeFileSync(path.join(dataDir, 'indices.json'), JSON.stringify(indices, null, 2));
     fs.writeFileSync(path.join(dataDir, 'edinet.json'), JSON.stringify(edinet, null, 2));
 
     console.log('Data updated successfully.');
