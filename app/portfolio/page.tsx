@@ -3,11 +3,14 @@
 import { useState } from 'react';
 import { useGameStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Package, TrendingUp, TrendingDown, BookOpen, Clock, Tag, ShoppingCart, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
+import { Package, TrendingUp, TrendingDown, BookOpen, Clock, Tag, ShoppingCart, ArrowUpDown, ChevronUp, ChevronDown, PieChart as PieChartIcon } from 'lucide-react';
 import { Stock } from '@/lib/types';
 import { TradeModal } from '@/components/Market/TradeModal';
 import { usePortfolioSort, SortableColumn } from '@/hooks/usePortfolioSort';
 import { useAssetSummary } from '@/hooks/useAssetSummary';
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function PortfolioPage() {
     const { holdings, transactions } = useGameStore();
@@ -17,6 +20,11 @@ export default function PortfolioPage() {
     const stockValue = totalAssets - cash;
 
     const { sortedHoldings, sortConfig, requestSort } = usePortfolioSort(holdings, totalAssets);
+
+    const pieData = [
+        { name: '現金', value: cash },
+        ...holdings.map(h => ({ name: h.name, value: h.currentPrice * h.quantity }))
+    ];
 
     const SortIcon = ({ column }: { column: SortableColumn }) => {
         if (!sortConfig || sortConfig.key !== column) return <ArrowUpDown size={12} className="ml-1 opacity-20" />;
@@ -203,6 +211,58 @@ export default function PortfolioPage() {
                                     <span className="font-mono font-bold">¥{stockValue.toLocaleString()}</span>
                                     <span className="text-[10px] text-slate-500 italic">({totalAssets > 0 ? ((stockValue / totalAssets) * 100).toFixed(1) : 0}%)</span>
                                 </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    <Card className="bg-white border-slate-100 shadow-sm rounded-3xl overflow-hidden">
+                        <CardHeader className="border-b border-slate-50">
+                            <div className="flex items-center space-x-2">
+                                <PieChartIcon className="h-4 w-4 text-blue-600" />
+                                <CardTitle className="text-sm font-bold">保有資産構成</CardTitle>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="h-48 mb-6">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={pieData}
+                                            innerRadius={40}
+                                            outerRadius={60}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            stroke="none"
+                                            label={({ percent }: any) => `${(percent * 100).toFixed(0)}%`}
+                                            labelLine={false}
+                                        >
+                                            {pieData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            formatter={(value: any) => `¥${Number(value).toLocaleString()}`}
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                            itemStyle={{ fontWeight: 'bold', fontSize: '10px' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="space-y-3">
+                                {pieData.map((entry, index) => {
+                                    const percentage = totalAssets > 0 ? (entry.value / totalAssets) * 100 : 0;
+                                    return (
+                                        <div key={entry.name} className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-2">
+                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                                <span className="text-[10px] font-bold text-slate-600 truncate max-w-[80px]">{entry.name}</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-xs font-black font-mono text-slate-900">{percentage.toFixed(1)}%</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </CardContent>
                     </Card>

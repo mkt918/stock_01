@@ -149,36 +149,57 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <AssetHistoryChart />
 
-                <Card className="h-96 bg-white border-slate-100 shadow-sm">
-                    <CardHeader>
-                        <CardTitle>ポートフォリオ構成</CardTitle>
+                {/* Asset Composition Chart */}
+                <Card className="bg-white border-slate-100 shadow-sm rounded-3xl overflow-hidden">
+                    <CardHeader className="border-b border-slate-50 pb-6">
+                        <CardTitle className="text-xl font-black text-slate-900 tracking-tight">保有資産構成</CardTitle>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Asset Composition</p>
                     </CardHeader>
-                    <CardContent className="h-80 flex items-center justify-center">
-                        {pieData.length > 0 ? (
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={pieData}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={100}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                    >
-                                        {pieData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip
-                                        formatter={(value: number | string | undefined) => `¥${Number(value ?? 0).toLocaleString()}`}
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                                    />
-                                </PieChart>
-                            </ResponsiveContainer>
-                        ) : (
-                            <p className="text-slate-400">データがありません</p>
-                        )}
+                    <CardContent className="p-8">
+                        <div className="flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 md:space-x-8">
+                            <div className="w-full h-80 md:w-3/5">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={pieData}
+                                            innerRadius={60}
+                                            outerRadius={90}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                            stroke="none"
+                                            label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                            labelLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                                        >
+                                            {pieData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            formatter={(value: any) => `¥${Number(value).toLocaleString()}`}
+                                            contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                            itemStyle={{ fontWeight: 'bold' }}
+                                        />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="w-full md:w-2/5 space-y-4">
+                                {pieData.map((entry, index) => {
+                                    const percentage = totalAssets > 0 ? (entry.value / totalAssets) * 100 : 0;
+                                    return (
+                                        <div key={entry.name} className="flex items-center justify-between group">
+                                            <div className="flex items-center space-x-3">
+                                                <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                                <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{entry.name}</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-sm font-black font-mono text-slate-900">{percentage.toFixed(1)}%</span>
+                                                <p className="text-[10px] font-bold text-slate-400">¥{(entry.value).toLocaleString()}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
 
