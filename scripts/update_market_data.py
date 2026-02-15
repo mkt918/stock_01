@@ -151,17 +151,29 @@ def fetch_stock_data():
                 change = price - prev_close if price and prev_close else 0
                 change_percent = (change / prev_close) * 100 if prev_close else 0
                 
-                # 配当情報の取得
-                dividend_rate = info.get('dividendRate', 0)
-                dividend_yield = info.get('dividendYield', 0)
+                # 配当情報の取得 (実績ベースを優先)
+                # trailingAnnualDividendRate: インデックスの過去1年間の配当実績
+                # dividendRate: 直近配当の年換算(予想の場合が多い)
+                dividend_rate = info.get('trailingAnnualDividendRate')
+                if dividend_rate is None:
+                     dividend_rate = info.get('dividendRate', 0)
+                
+                # 利回りの計算 (trailingAnnualDividendYield があればそれを使う)
+                dividend_yield = info.get('trailingAnnualDividendYield')
+                if dividend_yield is None:
+                    dividend_yield = info.get('dividendYield')
+                
                 if dividend_yield:
                     dividend_yield = dividend_yield * 100 # yfinance returns decimal (0.03 for 3%)
                 else:
-                    # Calculate if rate exists but yield missing
+                    # Calculate manually if yield is missing
                     if dividend_rate and price:
                         dividend_yield = (dividend_rate / price) * 100
                     else:
+                         # Force 0 if rate is 0 or None
                         dividend_yield = 0
+                        dividend_rate = 0 # Ensure rate is numeric 0 if None
+
 
                 # 権利確定月と受取月の推定 (一律ルール: 確定3/9月 -> 受取6/12月)
                 # ただしyfinanceからexDividendDateが取れればそれを考慮することも可能だが、
