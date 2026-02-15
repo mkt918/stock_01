@@ -130,6 +130,11 @@ export const useGameStore = create<GameState>()(
                 const stockValue = holdings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
                 const totalAssets = cash + stockValue;
 
+                // Attempt to get the latest index prices from a transient state if we want real-time, 
+                // but since recordHistory is called during updatePrices, we can pass them or fetch them.
+                // For now, let's keep it simple and record history without indices if not available, 
+                // but we'll try to fetch indices in updatePrices and then record.
+
                 const newEntry: AssetHistory = {
                     date: new Date().toISOString(),
                     totalAssets,
@@ -137,40 +142,67 @@ export const useGameStore = create<GameState>()(
                     stockValue
                 };
 
+                // Note: Index prices will be merged in updatePrices below to ensure accuracy
                 set({ assetHistory: [...assetHistory, newEntry] });
             },
 
             updatePrices: async () => {
-                const { holdings } = get();
-                if (holdings.length === 0) return;
+                const { holdings, assetHistory } = get();
 
                 try {
-                    // GitHub Pages base path support
-                    const response = await fetch('/stock_01/data/stocks.json');
-                    if (response.ok) {
-                        const data: Record<string, any> = await response.json();
+                    // Fetch stocks
+                    const stockRes = await fetch('/stock_01/data/stocks.json');
+                    let stockData: Record<string, any> = {};
+                    if (stockRes.ok) {
+                        stockData = await stockRes.json();
+                    }
 
-                        let newHoldings = [...holdings];
-                        let updated = false;
+                    // Fetch indices
+                    const indexRes = await fetch('/stock_01/data/indices.json');
+                    let indexData: Record<string, any> = {};
+                    if (indexRes.ok) {
+                        indexData = await indexRes.json();
+                    }
 
-                        newHoldings = newHoldings.map(item => {
-                            if (data[item.code]) {
-                                const newPrice = data[item.code].price;
-                                if (item.currentPrice !== newPrice) {
-                                    updated = true;
-                                    return { ...item, currentPrice: newPrice };
-                                }
+                    // Update holdings prices
+                    let updated = false;
+                    const newHoldings = holdings.map(item => {
+                        if (stockData[item.code]) {
+                            const newPrice = stockData[item.code].price;
+                            if (item.currentPrice !== newPrice) {
+                                updated = true;
+                                return { ...item, currentPrice: newPrice };
                             }
-                            return item;
+                        }
+                        return item;
+                    });
+
+                    // Update store if anything changed
+                    if (updated || Object.keys(indexData).length > 0) {
+                        const stockValue = newHoldings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
+                        const { cash } = get();
+                        const totalAssets = cash + stockValue;
+
+                        const indexPrices: Record<string, number> = {};
+                        Object.keys(indexData).forEach(key => {
+                            indexPrices[key] = indexData[key].price;
                         });
 
-                        if (updated) {
-                            set({ holdings: newHoldings });
-                            get().recordHistory();
-                        }
+                        const newEntry: AssetHistory = {
+                            date: new Date().toISOString(),
+                            totalAssets,
+                            cash,
+                            stockValue,
+                            indexPrices
+                        };
+
+                        set({
+                            holdings: newHoldings,
+                            assetHistory: [...assetHistory, newEntry]
+                        });
                     }
                 } catch (error) {
-                    console.error("Failed to update prices:", error);
+                    console.error("Failed to update prices/indices:", error);
                 }
             }
         }),

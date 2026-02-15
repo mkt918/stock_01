@@ -32,4 +32,5 @@ export interface AssetHistory {
   totalAssets: number;
   cash: number;
   stockValue: number;
+  indexPrices?: Record<string, number>;
 }

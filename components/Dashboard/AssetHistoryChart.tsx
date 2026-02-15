@@ -1,57 +1,190 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { useEffect, useState, useMemo } from 'react';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useGameStore } from '@/lib/store';
+import { Eye, EyeOff, Calendar, Layers } from 'lucide-react';
+
+const INDEX_CONFIG = [
+    { key: '^GSPC', name: 'S&P 500', color: '#ff4d4d' },
+    { key: '2559.T', name: 'オルカン', color: '#ffa64d' },
+    { key: '^TPX', name: 'TOPIX', color: '#4dff88' }
+];
 
 export function AssetHistoryChart() {
-    const { assetHistory } = useGameStore();
+    const { assetHistory, initialCapital } = useGameStore();
     const [mounted, setMounted] = useState(false);
+    const [visibleIndices, setVisibleIndices] = useState<Record<string, boolean>>({
+        '^GSPC': false,
+        '2559.T': false,
+        '^TPX': false
+    });
+    const [timeframe, setTimeframe] = useState<'daily' | 'weekly'>('daily');
+
     useEffect(() => { setMounted(true); }, []);
+
+    const processedData = useMemo(() => {
+        if (assetHistory.length === 0) {
+            return [{ date: new Date().toISOString(), value: initialCapital, dateStr: new Date().toLocaleDateString() }];
+        }
+
+        // Filter and aggregate by timeframe
+        let filtered = [...assetHistory];
+        if (timeframe === 'weekly') {
+            const weeklyMap: Record<string, any> = {};
+            filtered.forEach(entry => {
+                const date = new Date(entry.date);
+                const day = date.getDay();
+                const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
+                const monday = new Date(date.setDate(diff)).toISOString().split('T')[0];
+
+                // Keep the last entry of the week
+                weeklyMap[monday] = entry;
+            });
+            filtered = Object.values(weeklyMap).sort((a, b) => a.date.localeCompare(b.date));
+        }
+
+        // Find initial index values for normalization
+        const initialIndexValues: Record<string, number> = {};
+        filtered.forEach(entry => {
+            if (entry.indexPrices) {
+                Object.keys(entry.indexPrices).forEach(key => {
+                    if (!initialIndexValues[key]) initialIndexValues[key] = entry.indexPrices![key];
+                });
+            }
+        });
+
+        return filtered.map(d => {
+            const entry: any = {
+                ...d,
+                dateStr: new Date(d.date).toLocaleDateString(),
+                value: d.totalAssets
+            };
+
+            // Calculate simulation values for indices (10M * current / initial)
+            INDEX_CONFIG.forEach(idx => {
+                if (d.indexPrices && d.indexPrices[idx.key] && initialIndexValues[idx.key]) {
+                    entry[idx.key] = initialCapital * (d.indexPrices[idx.key] / initialIndexValues[idx.key]);
+                }
+            });
+
+            return entry;
+        });
+    }, [assetHistory, timeframe, initialCapital]);
+
+    const toggleIndex = (key: string) => {
+        setVisibleIndices(prev => ({ ...prev, [key]: !prev[key] }));
+    };
 
     if (!mounted) return null;
 
-    const data = assetHistory.length > 0 ? assetHistory : [
-        { date: new Date().toISOString(), totalAssets: 10000000 }
-    ];
-
-    const formattedData = data.map(d => ({
-        ...d,
-        dateStr: new Date(d.date).toLocaleDateString(),
-        value: d.totalAssets
-    }));
-
     return (
-        <Card className="col-span-1 lg:col-span-2 bg-white border-slate-100 shadow-sm">
-            <CardHeader>
-                <CardTitle>資産推移</CardTitle>
+        <Card className="col-span-1 lg:col-span-2 bg-white border-slate-100 shadow-sm rounded-3xl overflow-hidden">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between space-y-4 sm:space-y-0 pb-6 border-b border-slate-50">
+                <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-blue-50 rounded-xl text-blue-600">
+                        <Calendar size={20} />
+                    </div>
+                    <div>
+                        <CardTitle className="text-xl font-black text-slate-900 tracking-tight">資産推移比較</CardTitle>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Asset Comparison</p>
+                    </div>
+                </div>
+
+                <div className="flex items-center bg-slate-100 p-1 rounded-xl">
+                    <button
+                        onClick={() => setTimeframe('daily')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${timeframe === 'daily' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    >
+                        日足
+                    </button>
+                    <button
+                        onClick={() => setTimeframe('weekly')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${timeframe === 'weekly' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                    >
+                        週足
+                    </button>
+                </div>
             </CardHeader>
-            <CardContent className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={formattedData}>
-                        <defs>
-                            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
-                                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                        <XAxis dataKey="dateStr" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: '#94a3b8' }} />
-                        <YAxis
-                            tickFormatter={(value) => `¥${(value / 10000).toFixed(0)}万`}
-                            tickLine={false} axisLine={false}
-                            tick={{ fontSize: 12, fill: '#94a3b8' }}
-                            domain={['auto', 'auto']}
-                        />
-                        <Tooltip
-                            formatter={(value: any) => `¥${value.toLocaleString()}`}
-                            labelFormatter={(label) => label}
-                            contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                        />
-                        <Area type="monotone" dataKey="value" stroke="#3b82f6" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
-                    </AreaChart>
-                </ResponsiveContainer>
+
+            <CardContent className="p-6">
+                <div className="flex flex-wrap gap-2 mb-6">
+                    {INDEX_CONFIG.map(idx => (
+                        <button
+                            key={idx.key}
+                            onClick={() => toggleIndex(idx.key)}
+                            className={`flex items-center space-x-2 px-3 py-1.5 rounded-full border transition-all text-[10px] font-bold uppercase tracking-tight ${visibleIndices[idx.key] ? 'bg-white shadow-sm border-slate-200 text-slate-700' : 'bg-slate-50 border-transparent text-slate-400 opacity-60'}`}
+                        >
+                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: idx.color }} />
+                            <span>{idx.name}</span>
+                            {visibleIndices[idx.key] ? <Eye size={12} className="ml-1" /> : <EyeOff size={12} className="ml-1" />}
+                        </button>
+                    ))}
+                    <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-blue-600 text-white text-[10px] font-bold uppercase tracking-tight shadow-sm ml-auto">
+                        <Layers size={12} />
+                        <span>My Portfolio</span>
+                    </div>
+                </div>
+
+                <div className="h-80">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={processedData}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                            <XAxis
+                                dataKey="dateStr"
+                                tickLine={false}
+                                axisLine={false}
+                                tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'bold' }}
+                                padding={{ left: 10, right: 10 }}
+                            />
+                            <YAxis
+                                tickFormatter={(value) => `¥${(value / 10000).toLocaleString()}万`}
+                                tickLine={false}
+                                axisLine={false}
+                                tick={{ fontSize: 10, fill: '#94a3b8', fontWeight: 'bold' }}
+                                domain={['auto', 'auto']}
+                            />
+                            <Tooltip
+                                formatter={(value: any) => [`¥${Math.round(value).toLocaleString()}`, ""]}
+                                labelFormatter={(label) => `日付: ${label}`}
+                                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
+                                itemStyle={{ fontWeight: 'bold', fontSize: '12px' }}
+                            />
+
+                            {/* Comparison Indices */}
+                            {INDEX_CONFIG.map(idx => (
+                                visibleIndices[idx.key] && (
+                                    <Line
+                                        key={idx.key}
+                                        type="monotone"
+                                        dataKey={idx.key}
+                                        name={idx.name}
+                                        stroke={idx.color}
+                                        strokeWidth={2}
+                                        strokeDasharray="5 5"
+                                        dot={false}
+                                        activeDot={{ r: 4 }}
+                                    />
+                                )
+                            ))}
+
+                            {/* Main Portfolio Value */}
+                            <Line
+                                type="monotone"
+                                dataKey="value"
+                                name="ポートフォリオ"
+                                stroke="#3b82f6"
+                                strokeWidth={4}
+                                dot={{ r: 2, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
+                                activeDot={{ r: 6, strokeWidth: 0 }}
+                            />
+                        </LineChart>
+                    </ResponsiveContainer>
+                </div>
+                <div className="mt-4 text-[10px] text-slate-400 italic text-center">
+                    ※ 指数ラインは1000万円を基準日に一括購入したと仮定したシミュレーションです。
+                </div>
             </CardContent>
         </Card>
     );

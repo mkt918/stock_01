@@ -1,18 +1,70 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useGameStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Package, TrendingUp, TrendingDown, BookOpen, Clock, Tag, ShoppingCart } from 'lucide-react';
+import { Package, TrendingUp, TrendingDown, BookOpen, Clock, Tag, ShoppingCart, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
 import { PortfolioItem, Transaction, Stock } from '@/lib/types';
 import { TradeModal } from '@/components/Market/TradeModal';
+
+type SortableColumn = 'code' | 'name' | 'ratio' | 'quantity' | 'value' | 'pl';
+
+interface SortConfig {
+    key: SortableColumn;
+    direction: 'asc' | 'desc';
+}
 
 export default function PortfolioPage() {
     const { holdings, transactions, cash } = useGameStore();
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+    const [sortConfig, setSortConfig] = useState<SortConfig | null>({ key: 'ratio', direction: 'desc' });
 
     const stockValue = holdings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
     const totalAssets = cash + stockValue;
+
+    const sortedHoldings = useMemo(() => {
+        let sortable = holdings.map(h => {
+            const itemValue = h.currentPrice * h.quantity;
+            const ratio = totalAssets > 0 ? (itemValue / totalAssets) * 100 : 0;
+            const pl = (h.currentPrice - h.averagePrice) * h.quantity;
+            return { ...h, itemValue, ratio, pl };
+        });
+
+        if (sortConfig !== null) {
+            sortable.sort((a, b) => {
+                let aValue: any;
+                let bValue: any;
+
+                switch (sortConfig.key) {
+                    case 'code': aValue = a.code; bValue = b.code; break;
+                    case 'name': aValue = a.name; bValue = b.name; break;
+                    case 'ratio': aValue = a.ratio; bValue = b.ratio; break;
+                    case 'quantity': aValue = a.quantity; bValue = b.quantity; break;
+                    case 'value': aValue = a.itemValue; bValue = b.itemValue; break;
+                    case 'pl': aValue = a.pl; bValue = b.pl; break;
+                    default: return 0;
+                }
+
+                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+        return sortable;
+    }, [holdings, sortConfig, totalAssets]);
+
+    const requestSort = (key: SortableColumn) => {
+        let direction: 'asc' | 'desc' = 'asc';
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const SortIcon = ({ column }: { column: SortableColumn }) => {
+        if (!sortConfig || sortConfig.key !== column) return <ArrowUpDown size={12} className="ml-1 opacity-20" />;
+        return sortConfig.direction === 'asc' ? <ChevronUp size={12} className="ml-1 text-blue-500" /> : <ChevronDown size={12} className="ml-1 text-blue-500" />;
+    };
 
     return (
         <div className="space-y-8 pb-12">
@@ -40,22 +92,27 @@ export default function PortfolioPage() {
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
                                         <thead>
-                                            <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                                                <th className="px-6 py-4">銘柄</th>
-                                                <th className="px-6 py-4">構成比</th>
-                                                <th className="px-6 py-4">保有数</th>
-                                                <th className="px-6 py-4">評価額</th>
-                                                <th className="px-6 py-4">評価損益</th>
+                                            <tr className="bg-slate-50/50 text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
+                                                <th className="px-6 py-4 cursor-pointer hover:text-slate-600 transition-colors" onClick={() => requestSort('name')}>
+                                                    <div className="flex items-center">銘柄 <SortIcon column="name" /></div>
+                                                </th>
+                                                <th className="px-6 py-4 cursor-pointer hover:text-slate-600 transition-colors" onClick={() => requestSort('ratio')}>
+                                                    <div className="flex items-center">構成比 <SortIcon column="ratio" /></div>
+                                                </th>
+                                                <th className="px-6 py-4 cursor-pointer hover:text-slate-600 transition-colors" onClick={() => requestSort('quantity')}>
+                                                    <div className="flex items-center">保有数 <SortIcon column="quantity" /></div>
+                                                </th>
+                                                <th className="px-6 py-4 cursor-pointer hover:text-slate-600 transition-colors" onClick={() => requestSort('value')}>
+                                                    <div className="flex items-center">評価額 <SortIcon column="value" /></div>
+                                                </th>
+                                                <th className="px-6 py-4 cursor-pointer hover:text-slate-600 transition-colors" onClick={() => requestSort('pl')}>
+                                                    <div className="flex items-center">評価損益 <SortIcon column="pl" /></div>
+                                                </th>
                                                 <th className="px-6 py-4 text-center">操作</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-50">
-                                            {holdings.map((item) => {
-                                                const itemValue = item.currentPrice * item.quantity;
-                                                const ratio = totalAssets > 0 ? (itemValue / totalAssets) * 100 : 0;
-                                                const pl = (item.currentPrice - item.averagePrice) * item.quantity;
-                                                const plPercent = ((item.currentPrice / item.averagePrice) - 1) * 100;
-
+                                            {sortedHoldings.map((item) => {
                                                 const stockForModal: Stock = {
                                                     code: item.code,
                                                     name: item.name,
@@ -73,11 +130,11 @@ export default function PortfolioPage() {
                                                         </td>
                                                         <td className="px-6 py-5">
                                                             <div className="flex flex-col">
-                                                                <span className="font-mono font-bold text-slate-700">{ratio.toFixed(1)}%</span>
+                                                                <span className="font-mono font-bold text-slate-700">{item.ratio.toFixed(1)}%</span>
                                                                 <div className="w-16 h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
                                                                     <div
                                                                         className="h-full bg-blue-500 rounded-full"
-                                                                        style={{ width: `${ratio}%` }}
+                                                                        style={{ width: `${item.ratio}%` }}
                                                                     />
                                                                 </div>
                                                             </div>
@@ -87,16 +144,16 @@ export default function PortfolioPage() {
                                                             <div className="text-[10px] text-slate-400">@¥{Math.round(item.averagePrice).toLocaleString()}</div>
                                                         </td>
                                                         <td className="px-6 py-5">
-                                                            <div className="font-mono font-black text-slate-900">¥{itemValue.toLocaleString()}</div>
+                                                            <div className="font-mono font-black text-slate-900">¥{item.itemValue.toLocaleString()}</div>
                                                             <div className="text-[10px] text-slate-400 font-medium">現: ¥{item.currentPrice.toLocaleString()}</div>
                                                         </td>
                                                         <td className="px-6 py-5">
-                                                            <div className={`font-mono font-bold flex items-center ${pl >= 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                                                {pl >= 0 ? <TrendingUp size={14} className="mr-1" /> : <TrendingDown size={14} className="mr-1" />}
-                                                                ¥{Math.round(pl).toLocaleString()}
+                                                            <div className={`font-mono font-bold flex items-center ${item.pl >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                                                {item.pl >= 0 ? <TrendingUp size={14} className="mr-1" /> : <TrendingDown size={14} className="mr-1" />}
+                                                                ¥{Math.round(item.pl).toLocaleString()}
                                                             </div>
-                                                            <div className={`text-xs font-bold ${pl >= 0 ? 'text-red-400' : 'text-green-400'}`}>
-                                                                {pl >= 0 ? '+' : ''}{plPercent.toFixed(2)}%
+                                                            <div className={`text-xs font-bold ${item.pl >= 0 ? 'text-red-400' : 'text-green-400'}`}>
+                                                                {item.pl >= 0 ? '+' : ''}{((item.currentPrice / item.averagePrice - 1) * 100).toFixed(2)}%
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-5 text-center">
