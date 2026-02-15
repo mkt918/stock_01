@@ -47,7 +47,7 @@ export default function MarketPage() {
         try {
             let staticData: Record<string, { price: number; change: number; changePercent: number }> = {};
             try {
-                const res = await fetch('/stock_01/data/stocks.json');
+                const res = await fetch(`/stock_01/data/stocks.json?t=${new Date().getTime()}`);
                 if (res.ok) {
                     staticData = await res.json();
                     setLastUpdated(new Date());
@@ -75,7 +75,7 @@ export default function MarketPage() {
 
     const fetchIndices = async () => {
         try {
-            const res = await fetch('/stock_01/data/indices.json');
+            const res = await fetch(`/stock_01/data/indices.json?t=${new Date().getTime()}`);
             if (res.ok) {
                 const data = await res.json();
                 setIndices(data);
@@ -87,7 +87,7 @@ export default function MarketPage() {
 
     const fetchSearchIndex = async () => {
         try {
-            const res = await fetch('/stock_01/data/search-index.json');
+            const res = await fetch(`/stock_01/data/search-index.json?t=${new Date().getTime()}`);
             if (res.ok) {
                 const data = await res.json();
                 setSearchIndex(data);
@@ -150,7 +150,7 @@ export default function MarketPage() {
 
     const indexList = [
         { key: '^GSPC', label: 'S&P 500', flag: '🇺🇸' },
-        { key: '^TPX',  label: 'TOPIX',   flag: '🇯🇵' },
+        { key: '^TPX', label: 'TOPIX', flag: '🇯🇵' },
         { key: '2559.T', label: 'オルカン', flag: '🌍' },
     ];
 

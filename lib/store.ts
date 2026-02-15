@@ -146,13 +146,13 @@ export const useGameStore = create<GameState>()(
                 const { holdings, assetHistory } = get();
 
                 try {
-                    const stockRes = await fetch('/stock_01/data/stocks.json');
+                    const stockRes = await fetch(`/stock_01/data/stocks.json?t=${new Date().getTime()}`);
                     let stockData: Record<string, { price: number }> = {};
                     if (stockRes.ok) {
                         stockData = await stockRes.json();
                     }
 
-                    const indexRes = await fetch('/stock_01/data/indices.json');
+                    const indexRes = await fetch(`/stock_01/data/indices.json?t=${new Date().getTime()}`);
                     let indexData: Record<string, { price: number }> = {};
                     if (indexRes.ok) {
                         indexData = await indexRes.json();
