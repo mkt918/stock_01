@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Stock } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Search, TrendingUp, TrendingDown, RefreshCcw } from 'lucide-react';
@@ -59,8 +59,9 @@ export default function MarketPage() {
         }
     };
 
-    const filteredStocks = stocks.filter(s =>
-        s.name.includes(search) || s.code.includes(search)
+    const filteredStocks = useMemo(
+        () => stocks.filter(s => s.name.includes(search) || s.code.includes(search)),
+        [stocks, search]
     );
 
     return (

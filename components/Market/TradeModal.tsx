@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Stock } from '@/lib/types';
 import { useGameStore } from '@/lib/store';
+import { toast } from '@/hooks/useToast';
 import { X, ExternalLink, Activity, Info, BarChart3, Wallet2 } from 'lucide-react';
 import { simulatePrice } from '@/lib/simulation';
 
@@ -46,19 +47,19 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
 
     const handleTrade = () => {
         if (reason.length < 5) {
-            alert("売買理由を5文字以上で入力してください");
+            toast.warning("売買理由を5文字以上で入力してください");
             return;
         }
 
         if (mode === 'buy') {
             if (totalCost > cash) {
-                alert("資金が不足しています");
+                toast.error("資金が不足しています");
                 return;
             }
             buyStock({ ...stock, price: currentPrice }, quantity, reason);
         } else {
             if (quantity > ownedQuantity) {
-                alert("保有株数が不足しています");
+                toast.error("保有株数が不足しています");
                 return;
             }
             sellStock({ ...stock, price: currentPrice }, quantity, reason);

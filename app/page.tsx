@@ -7,54 +7,24 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { LatestDisclosures } from '@/components/Dashboard/LatestDisclosures';
 import Link from 'next/link';
 import { ArrowRight, Wallet, TrendingUp, TrendingDown, History, RefreshCcw } from 'lucide-react';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
+import { useAssetSummary } from '@/hooks/useAssetSummary';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function Dashboard() {
-    const { cash, holdings, resetGame, updatePrices } = useGameStore();
-
+    const { holdings, resetGame } = useGameStore();
     const [mounted, setMounted] = useState(false);
-    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-    const [isRefreshing, setIsRefreshing] = useState(false);
-    const [indices, setIndices] = useState<any>({});
 
-    const handleRefresh = useCallback(async () => {
-        setIsRefreshing(true);
-        await updatePrices();
-
-        try {
-            const res = await fetch('/stock_01/data/indices.json');
-            if (res.ok) {
-                const data = await res.json();
-                setIndices(data);
-            }
-        } catch (e) {
-            console.warn("Failed to fetch indices");
-        }
-
-        setLastUpdated(new Date());
-        setIsRefreshing(false);
-    }, [updatePrices]);
+    const { lastUpdated, isRefreshing, indices, handleRefresh } = useAutoRefresh(60000);
+    const { cash, totalAssets, profit, profitPercent } = useAssetSummary();
 
     useEffect(() => {
         setMounted(true);
-        handleRefresh();
-
-        const interval = setInterval(() => {
-            handleRefresh();
-        }, 60000);
-
-        return () => clearInterval(interval);
-    }, [handleRefresh]);
+    }, []);
 
     if (!mounted) return null;
-
-    const totalStockValue = holdings.reduce((acc, h) => acc + (h.currentPrice * h.quantity), 0);
-    const totalAssets = cash + totalStockValue;
-    const initialCapital = 10000000;
-    const profit = totalAssets - initialCapital;
-    const profitPercent = (profit / initialCapital) * 100;
 
     const pieData = [
         { name: '現金', value: cash },
@@ -98,7 +68,7 @@ export default function Dashboard() {
             {/* Major Indices Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {Object.values(indices).length > 0 ? (
-                    Object.values(indices).map((idx: any) => (
+                    Object.values(indices).map((idx) => (
                         <div key={idx.name} className="bg-white/50 backdrop-blur-sm border border-slate-100 rounded-2xl p-4 shadow-sm flex justify-between items-center">
                             <div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{idx.name}</p>
@@ -201,7 +171,7 @@ export default function Dashboard() {
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        formatter={(value: any) => `¥${value.toLocaleString()}`}
+                                        formatter={(value: number) => `¥${value.toLocaleString()}`}
                                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                                     />
                                 </PieChart>

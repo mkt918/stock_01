@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const EDINET_API_KEY = process.env.EDINET_API_KEY || '43f1d406817e4f3285ad3c3b9202c70b';
+const EDINET_API_KEY = process.env.EDINET_API_KEY;
 const EDINET_API_BASE_URL = 'https://api.edinet-fsa.go.jp/api/v2';
 
 export interface EdinetDocument {
@@ -12,6 +12,11 @@ export interface EdinetDocument {
 }
 
 export async function getDocumentsForDate(date: Date): Promise<EdinetDocument[]> {
+    if (!EDINET_API_KEY) {
+        console.error('EDINET_API_KEY is not set. Please configure it in .env.local');
+        return [];
+    }
+
     try {
         const dateString = date.toISOString().split('T')[0];
 
@@ -27,7 +32,7 @@ export async function getDocumentsForDate(date: Date): Promise<EdinetDocument[]>
         });
 
         if (response.data && response.data.results) {
-            return response.data.results.map((doc: any) => ({
+            return response.data.results.map((doc: { docID: string; filerName: string; docDescription: string; submitDateTime: string; secCode?: string }) => ({
                 docID: doc.docID,
                 filerName: doc.filerName,
                 docDescription: doc.docDescription,

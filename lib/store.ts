@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Stock, PortfolioItem, Transaction, AssetHistory } from './types';
+import { toast } from '@/hooks/useToast';
 
 interface GameState {
     cash: number;
@@ -13,8 +14,8 @@ interface GameState {
     buyStock: (stock: Stock, quantity: number, reason: string) => void;
     sellStock: (stock: Stock, quantity: number, reason: string) => void;
     resetGame: () => void;
-    recordHistory: () => void; // Call this periodically or on page load to track assets over time
-    updatePrices: () => Promise<void>; // Fetch latest prices for all holdings
+    recordHistory: () => void;
+    updatePrices: () => Promise<void>;
 }
 
 export const useGameStore = create<GameState>()(
@@ -28,16 +29,15 @@ export const useGameStore = create<GameState>()(
 
             buyStock: (stock, quantity, reason) => {
                 const { cash, holdings, transactions } = get();
-                const totalCost = stock.price! * quantity; // Assume price exists
+                const totalCost = stock.price! * quantity;
 
                 if (totalCost > cash) {
-                    alert("資金不足です！");
+                    toast.error("資金不足です！買付余力を確認してください。");
                     return;
                 }
 
                 const newCash = cash - totalCost;
 
-                // Update holdings
                 const existingItem = holdings.find(h => h.code === stock.code);
                 let newHoldings = [...holdings];
 
@@ -62,7 +62,7 @@ export const useGameStore = create<GameState>()(
                 }
 
                 const transaction: Transaction = {
-                    id: Math.random().toString(36).substring(7),
+                    id: crypto.randomUUID(),
                     date: new Date().toISOString(),
                     code: stock.code,
                     name: stock.name,
@@ -75,6 +75,7 @@ export const useGameStore = create<GameState>()(
 
                 set({ cash: newCash, holdings: newHoldings, transactions: [transaction, ...transactions] });
                 get().recordHistory();
+                toast.success(`${stock.name} を ${quantity.toLocaleString()} 株購入しました`);
             },
 
             sellStock: (stock, quantity, reason) => {
@@ -82,7 +83,7 @@ export const useGameStore = create<GameState>()(
                 const existingItem = holdings.find(h => h.code === stock.code);
 
                 if (!existingItem || existingItem.quantity < quantity) {
-                    alert("保有数が不足しています！");
+                    toast.error("保有数が不足しています！");
                     return;
                 }
 
@@ -101,7 +102,7 @@ export const useGameStore = create<GameState>()(
                 }
 
                 const transaction: Transaction = {
-                    id: Math.random().toString(36).substring(7),
+                    id: crypto.randomUUID(),
                     date: new Date().toISOString(),
                     code: stock.code,
                     name: stock.name,
@@ -114,6 +115,7 @@ export const useGameStore = create<GameState>()(
 
                 set({ cash: newCash, holdings: newHoldings, transactions: [transaction, ...transactions] });
                 get().recordHistory();
+                toast.success(`${stock.name} を ${quantity.toLocaleString()} 株売却しました`);
             },
 
             resetGame: () => {
@@ -130,11 +132,6 @@ export const useGameStore = create<GameState>()(
                 const stockValue = holdings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
                 const totalAssets = cash + stockValue;
 
-                // Attempt to get the latest index prices from a transient state if we want real-time, 
-                // but since recordHistory is called during updatePrices, we can pass them or fetch them.
-                // For now, let's keep it simple and record history without indices if not available, 
-                // but we'll try to fetch indices in updatePrices and then record.
-
                 const newEntry: AssetHistory = {
                     date: new Date().toISOString(),
                     totalAssets,
@@ -142,7 +139,6 @@ export const useGameStore = create<GameState>()(
                     stockValue
                 };
 
-                // Note: Index prices will be merged in updatePrices below to ensure accuracy
                 set({ assetHistory: [...assetHistory, newEntry] });
             },
 
@@ -150,21 +146,18 @@ export const useGameStore = create<GameState>()(
                 const { holdings, assetHistory } = get();
 
                 try {
-                    // Fetch stocks
                     const stockRes = await fetch('/stock_01/data/stocks.json');
-                    let stockData: Record<string, any> = {};
+                    let stockData: Record<string, { price: number }> = {};
                     if (stockRes.ok) {
                         stockData = await stockRes.json();
                     }
 
-                    // Fetch indices
                     const indexRes = await fetch('/stock_01/data/indices.json');
-                    let indexData: Record<string, any> = {};
+                    let indexData: Record<string, { price: number }> = {};
                     if (indexRes.ok) {
                         indexData = await indexRes.json();
                     }
 
-                    // Update holdings prices
                     let updated = false;
                     const newHoldings = holdings.map(item => {
                         if (stockData[item.code]) {
@@ -177,7 +170,6 @@ export const useGameStore = create<GameState>()(
                         return item;
                     });
 
-                    // Update store if anything changed
                     if (updated || Object.keys(indexData).length > 0) {
                         const stockValue = newHoldings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
                         const { cash } = get();

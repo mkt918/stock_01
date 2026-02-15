@@ -1,65 +1,22 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useGameStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Package, TrendingUp, TrendingDown, BookOpen, Clock, Tag, ShoppingCart, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
-import { PortfolioItem, Transaction, Stock } from '@/lib/types';
+import { Stock } from '@/lib/types';
 import { TradeModal } from '@/components/Market/TradeModal';
-
-type SortableColumn = 'code' | 'name' | 'ratio' | 'quantity' | 'value' | 'pl';
-
-interface SortConfig {
-    key: SortableColumn;
-    direction: 'asc' | 'desc';
-}
+import { usePortfolioSort, SortableColumn } from '@/hooks/usePortfolioSort';
+import { useAssetSummary } from '@/hooks/useAssetSummary';
 
 export default function PortfolioPage() {
-    const { holdings, transactions, cash } = useGameStore();
+    const { holdings, transactions } = useGameStore();
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
-    const [sortConfig, setSortConfig] = useState<SortConfig | null>({ key: 'ratio', direction: 'desc' });
 
-    const stockValue = holdings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
-    const totalAssets = cash + stockValue;
+    const { cash, totalAssets } = useAssetSummary();
+    const stockValue = totalAssets - cash;
 
-    const sortedHoldings = useMemo(() => {
-        let sortable = holdings.map(h => {
-            const itemValue = h.currentPrice * h.quantity;
-            const ratio = totalAssets > 0 ? (itemValue / totalAssets) * 100 : 0;
-            const pl = (h.currentPrice - h.averagePrice) * h.quantity;
-            return { ...h, itemValue, ratio, pl };
-        });
-
-        if (sortConfig !== null) {
-            sortable.sort((a, b) => {
-                let aValue: any;
-                let bValue: any;
-
-                switch (sortConfig.key) {
-                    case 'code': aValue = a.code; bValue = b.code; break;
-                    case 'name': aValue = a.name; bValue = b.name; break;
-                    case 'ratio': aValue = a.ratio; bValue = b.ratio; break;
-                    case 'quantity': aValue = a.quantity; bValue = b.quantity; break;
-                    case 'value': aValue = a.itemValue; bValue = b.itemValue; break;
-                    case 'pl': aValue = a.pl; bValue = b.pl; break;
-                    default: return 0;
-                }
-
-                if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
-                if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-        }
-        return sortable;
-    }, [holdings, sortConfig, totalAssets]);
-
-    const requestSort = (key: SortableColumn) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
-        }
-        setSortConfig({ key, direction });
-    };
+    const { sortedHoldings, sortConfig, requestSort } = usePortfolioSort(holdings, totalAssets);
 
     const SortIcon = ({ column }: { column: SortableColumn }) => {
         if (!sortConfig || sortConfig.key !== column) return <ArrowUpDown size={12} className="ml-1 opacity-20" />;
@@ -178,7 +135,7 @@ export default function PortfolioPage() {
                     {/* Stock Note (Transaction History) */}
                     <div className="space-y-4">
                         <div className="flex items-center space-x-2 px-2">
-                            < BookOpen className="h-6 w-6 text-purple-600" />
+                            <BookOpen className="h-6 w-6 text-purple-600" />
                             <h2 className="text-xl font-bold text-slate-800">株ノート (取引記録)</h2>
                         </div>
                         <div className="space-y-4">
