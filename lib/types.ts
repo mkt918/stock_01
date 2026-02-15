@@ -24,6 +24,7 @@ export interface Transaction {
   quantity: number;
   price: number;
   total: number;
+  reason: string;
 }
 
 export interface AssetHistory {

@@ -10,8 +10,8 @@ interface GameState {
     assetHistory: AssetHistory[];
 
     // Actions
-    buyStock: (stock: Stock, quantity: number) => void;
-    sellStock: (stock: Stock, quantity: number) => void;
+    buyStock: (stock: Stock, quantity: number, reason: string) => void;
+    sellStock: (stock: Stock, quantity: number, reason: string) => void;
     resetGame: () => void;
     recordHistory: () => void; // Call this periodically or on page load to track assets over time
     updatePrices: () => Promise<void>; // Fetch latest prices for all holdings
@@ -26,7 +26,7 @@ export const useGameStore = create<GameState>()(
             transactions: [],
             assetHistory: [],
 
-            buyStock: (stock, quantity) => {
+            buyStock: (stock, quantity, reason) => {
                 const { cash, holdings, transactions } = get();
                 const totalCost = stock.price! * quantity; // Assume price exists
 
@@ -69,14 +69,15 @@ export const useGameStore = create<GameState>()(
                     type: 'buy',
                     quantity,
                     price: stock.price!,
-                    total: totalCost
+                    total: totalCost,
+                    reason: reason
                 };
 
                 set({ cash: newCash, holdings: newHoldings, transactions: [transaction, ...transactions] });
                 get().recordHistory();
             },
 
-            sellStock: (stock, quantity) => {
+            sellStock: (stock, quantity, reason) => {
                 const { cash, holdings, transactions } = get();
                 const existingItem = holdings.find(h => h.code === stock.code);
 
@@ -107,7 +108,8 @@ export const useGameStore = create<GameState>()(
                     type: 'sell',
                     quantity,
                     price: stock.price!,
-                    total: totalProceeds
+                    total: totalProceeds,
+                    reason: reason
                 };
 
                 set({ cash: newCash, holdings: newHoldings, transactions: [transaction, ...transactions] });

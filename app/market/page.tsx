@@ -13,6 +13,7 @@ export default function MarketPage() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
     useEffect(() => {
         fetchStocks();
@@ -29,6 +30,7 @@ export default function MarketPage() {
                 const res = await fetch('/stock_01/data/stocks.json');
                 if (res.ok) {
                     staticData = await res.json();
+                    setLastUpdated(new Date());
                 }
             } catch (e) {
                 console.warn("Static data not found, using simulation fallback");
