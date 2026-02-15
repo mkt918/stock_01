@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Stock } from '@/lib/types';
+import { Stock, DividendInfo } from '@/lib/types';
 import { useGameStore } from '@/lib/store';
 import { toast } from '@/hooks/useToast';
 import { X, ExternalLink, Activity, Info, BarChart3, Wallet2 } from 'lucide-react';
@@ -23,6 +23,8 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
 
     const [isSimulated, setIsSimulated] = useState(false);
 
+    const [dividendInfo, setDividendInfo] = useState<DividendInfo | undefined>(stock.dividend);
+
     useEffect(() => {
         if (isOpen) {
             fetchPrice();
@@ -39,8 +41,13 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
             if (res.ok) {
                 const data = await res.json();
                 const stockData = data[stock.code];
-                if (stockData && stockData.price) {
-                    setCurrentPrice(stockData.price);
+                if (stockData) {
+                    if (stockData.price) {
+                        setCurrentPrice(stockData.price);
+                    }
+                    if (stockData.dividend) {
+                        setDividendInfo(stockData.dividend);
+                    }
                     setLoading(false);
                     return;
                 }
@@ -138,6 +145,25 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
                                 <ExternalLink size={20} className="text-white/50 group-hover:text-white transition-colors" />
                             </a>
                         </div>
+
+
+                        {/* Dividend Info */}
+                        {dividendInfo && (
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 text-center">
+                                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">配当利回り</p>
+                                    <p className="text-lg font-black text-emerald-700 font-mono">{dividendInfo.yield}%</p>
+                                </div>
+                                <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 text-center">
+                                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">予想配当(年)</p>
+                                    <p className="text-lg font-black text-emerald-700 font-mono">¥{dividendInfo.rate}</p>
+                                </div>
+                                <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 text-center">
+                                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">権利確定月</p>
+                                    <p className="text-lg font-black text-emerald-700 font-mono">{dividendInfo.vestingMonths.join('·')}月</p>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Price & Holdings Summary */}
                         {isSimulated && (

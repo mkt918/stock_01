@@ -9,6 +9,7 @@ import { TradeModal } from '@/components/Market/TradeModal';
 import { usePortfolioSort, SortableColumn } from '@/hooks/usePortfolioSort';
 import { useAssetSummary } from '@/hooks/useAssetSummary';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import { DividendChart } from '@/components/Dashboard/DividendChart';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
@@ -70,6 +71,9 @@ export default function PortfolioPage() {
                                                 <th className="px-6 py-4 cursor-pointer hover:text-slate-600 transition-colors" onClick={() => requestSort('value')}>
                                                     <div className="flex items-center">評価額 <SortIcon column="value" /></div>
                                                 </th>
+                                                <th className="px-6 py-4">
+                                                    <div className="flex items-center">予想配当(年)</div>
+                                                </th>
                                                 <th className="px-6 py-4 cursor-pointer hover:text-slate-600 transition-colors" onClick={() => requestSort('pl')}>
                                                     <div className="flex items-center">評価損益 <SortIcon column="pl" /></div>
                                                 </th>
@@ -84,8 +88,11 @@ export default function PortfolioPage() {
                                                     price: item.currentPrice,
                                                     basePrice: item.averagePrice,
                                                     change: 0,
-                                                    changePercent: 0
+                                                    changePercent: 0,
+                                                    dividend: item.dividend
                                                 };
+
+                                                const dividendAmount = item.dividend ? item.dividend.rate * item.quantity : 0;
 
                                                 return (
                                                     <tr key={item.code} className="hover:bg-slate-50/50 transition-colors group">
@@ -111,6 +118,14 @@ export default function PortfolioPage() {
                                                         <td className="px-6 py-5">
                                                             <div className="font-mono font-black text-slate-900">¥{item.itemValue.toLocaleString()}</div>
                                                             <div className="text-[10px] text-slate-400 font-medium">現: ¥{item.currentPrice.toLocaleString()}</div>
+                                                        </td>
+                                                        <td className="px-6 py-5">
+                                                            <div className="font-mono font-bold text-emerald-600">¥{dividendAmount.toLocaleString()}</div>
+                                                            {item.dividend ? (
+                                                                <div className="text-[10px] text-emerald-500 font-bold">{item.dividend.yield}% / 確定 {item.dividend.vestingMonths.join('・')}月</div>
+                                                            ) : (
+                                                                <div className="text-[10px] text-slate-300">-</div>
+                                                            )}
                                                         </td>
                                                         <td className="px-6 py-5">
                                                             <div className={`font-mono font-bold flex items-center ${item.pl >= 0 ? 'text-red-500' : 'text-green-500'}`}>
@@ -214,6 +229,9 @@ export default function PortfolioPage() {
                             </div>
                         </CardContent>
                     </Card>
+
+                    {/* Dividend Chart [NEW] */}
+                    <DividendChart holdings={holdings} />
 
                     <Card className="bg-white border-slate-100 shadow-sm rounded-3xl overflow-hidden">
                         <CardHeader className="border-b border-slate-50">

@@ -17,6 +17,13 @@ export interface StockWithPrice extends StockBase {
  * - 一覧表示時は price などが optional
  * - TradeModal や buyStock に渡す際は price が必須
  */
+export interface DividendInfo {
+  rate: number;          // 年間配当金 (円/株)
+  yield: number;         // 配当利回り (%)
+  vestingMonths: number[]; // 権利確定月
+  payoutMonths: number[];  // 受取月 (推定)
+}
+
 export interface Stock {
   code: string;
   name: string;
@@ -24,6 +31,7 @@ export interface Stock {
   price?: number;
   change?: number;
   changePercent?: number;
+  dividend?: DividendInfo;
 }
 
 export interface PortfolioItem {
@@ -32,6 +40,7 @@ export interface PortfolioItem {
   quantity: number;
   averagePrice: number;
   currentPrice: number;
+  dividend?: DividendInfo;
 }
 
 export interface Transaction {

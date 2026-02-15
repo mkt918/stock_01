@@ -161,11 +161,18 @@ export const useGameStore = create<GameState>()(
                     let updated = false;
                     const newHoldings = holdings.map(item => {
                         if (stockData[item.code]) {
-                            const newPrice = stockData[item.code].price;
-                            if (item.currentPrice !== newPrice) {
-                                updated = true;
-                                return { ...item, currentPrice: newPrice };
-                            }
+                            const data = stockData[item.code];
+                            const newPrice = data.price;
+                            // Check if price OR dividend changed
+                            // For simplicity, we update if stockData exists
+                            // We cast to any to avoid strict type checking on stockData structure if defined vaguely above
+                            const dividend = (data as any).dividend;
+
+                            return {
+                                ...item,
+                                currentPrice: newPrice,
+                                dividend: dividend
+                            };
                         }
                         return item;
                     });
