@@ -4,9 +4,7 @@ import { useGameStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { AssetHistoryChart } from '@/components/Dashboard/AssetHistoryChart';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { LatestDisclosures } from '@/components/Dashboard/LatestDisclosures';
-import Link from 'next/link';
-import { ArrowRight, Wallet, TrendingUp, TrendingDown, History, RefreshCcw } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, History, RefreshCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { useAssetSummary } from '@/hooks/useAssetSummary';
@@ -145,26 +143,26 @@ export default function Dashboard() {
                 </Card>
             </div>
 
-            {/* Charts & Lists */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Charts Section */}
+            <div className="space-y-8">
                 <AssetHistoryChart />
 
-                {/* Asset Composition Chart */}
+                {/* Asset Composition Chart - Expanded */}
                 <Card className="bg-white border-slate-100 shadow-sm rounded-3xl overflow-hidden">
                     <CardHeader className="border-b border-slate-50 pb-6">
                         <CardTitle className="text-xl font-black text-slate-900 tracking-tight">保有資産構成</CardTitle>
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Asset Composition</p>
                     </CardHeader>
-                    <CardContent className="p-8">
-                        <div className="flex flex-col md:flex-row items-center justify-between space-y-8 md:space-y-0 md:space-x-8">
-                            <div className="w-full h-80 md:w-3/5">
+                    <CardContent className="p-10">
+                        <div className="flex flex-col lg:flex-row items-center justify-between space-y-12 lg:space-y-0 lg:space-x-16">
+                            <div className="w-full h-[400px] lg:w-3/5">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <PieChart>
                                         <Pie
                                             data={pieData}
-                                            innerRadius={60}
-                                            outerRadius={90}
-                                            paddingAngle={5}
+                                            innerRadius={100}
+                                            outerRadius={150}
+                                            paddingAngle={8}
                                             dataKey="value"
                                             stroke="none"
                                             label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
@@ -176,24 +174,24 @@ export default function Dashboard() {
                                         </Pie>
                                         <Tooltip
                                             formatter={(value: any) => `¥${Number(value).toLocaleString()}`}
-                                            contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                            itemStyle={{ fontWeight: 'bold' }}
+                                            contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)' }}
+                                            itemStyle={{ fontWeight: 'bold', fontSize: '14px' }}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
                             </div>
-                            <div className="w-full md:w-2/5 space-y-4">
+                            <div className="w-full lg:w-2/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
                                 {pieData.map((entry, index) => {
                                     const percentage = totalAssets > 0 ? (entry.value / totalAssets) * 100 : 0;
                                     return (
-                                        <div key={entry.name} className="flex items-center justify-between group">
-                                            <div className="flex items-center space-x-3">
-                                                <div className="w-3 h-3 rounded-full shadow-sm" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                                                <span className="text-sm font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{entry.name}</span>
+                                        <div key={entry.name} className="flex items-center justify-between p-4 bg-slate-50/50 rounded-2xl border border-slate-100/50 group hover:bg-white hover:shadow-md transition-all">
+                                            <div className="flex items-center space-x-4">
+                                                <div className="w-4 h-4 rounded-full shadow-sm" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                                <span className="text-base font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{entry.name}</span>
                                             </div>
                                             <div className="text-right">
-                                                <span className="text-sm font-black font-mono text-slate-900">{percentage.toFixed(1)}%</span>
-                                                <p className="text-[10px] font-bold text-slate-400">¥{(entry.value).toLocaleString()}</p>
+                                                <span className="text-lg font-black font-mono text-slate-900">{percentage.toFixed(1)}%</span>
+                                                <p className="text-xs font-bold text-slate-400">¥{(entry.value).toLocaleString()}</p>
                                             </div>
                                         </div>
                                     );
@@ -202,48 +200,7 @@ export default function Dashboard() {
                         </div>
                     </CardContent>
                 </Card>
-
-                <Card className="bg-white border-slate-100 shadow-sm">
-                    <CardHeader>
-                        <CardTitle>クイックアクション</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-4">
-                            <Link href="/market" className="block p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors border border-slate-200 group">
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="bg-white p-2 rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
-                                            <TrendingUp className="h-5 w-5 text-blue-600" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-semibold text-slate-900">株を購入する</h4>
-                                            <p className="text-xs text-slate-500">市場を見て銘柄を探す</p>
-                                        </div>
-                                    </div>
-                                    <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
-                                </div>
-                            </Link>
-
-                            <Link href="/portfolio" className="block p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors border border-slate-200 group">
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center space-x-3">
-                                        <div className="bg-white p-2 rounded-lg shadow-sm group-hover:shadow-md transition-shadow">
-                                            <Wallet className="h-5 w-5 text-purple-600" />
-                                        </div>
-                                        <div>
-                                            <h4 className="font-semibold text-slate-900">保有銘柄を確認</h4>
-                                            <p className="text-xs text-slate-500">詳細な損益状況を見る</p>
-                                        </div>
-                                    </div>
-                                    <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-purple-500 transition-colors" />
-                                </div>
-                            </Link>
-                        </div>
-                    </CardContent>
-                </Card>
             </div>
-
-            <LatestDisclosures />
-        </div >
+        </div>
     );
 }
