@@ -1,7 +1,10 @@
-import yahooFinance from 'yahoo-finance2';
+import YahooFinanceClass from 'yahoo-finance2';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
+
+// Instantiate the class as per library requirements in some environments
+const yahooFinance = new YahooFinanceClass();
 
 const EDINET_API_KEY = process.env.EDINET_API_KEY || '43f1d406817e4f3285ad3c3b9202c70b';
 const EDINET_API_BASE_URL = 'https://api.edinet-fsa.go.jp/api/v2';
@@ -12,7 +15,6 @@ const POPULAR_STOCKS = [
     { code: '9984', name: 'ソフトバンクグループ' },
     { code: '9432', name: '日本電信電話(NTT)' },
     { code: '7974', name: '任天堂' },
-    // Need to include all popular stocks from constants
     { code: '7267', name: '本田技研工業' },
     { code: '8035', name: '東京エレクトロン' },
     { code: '9983', name: 'ファーストリテイリング' }
@@ -24,14 +26,16 @@ async function fetchStocks() {
     for (const stock of POPULAR_STOCKS) {
         try {
             const quote = await yahooFinance.quote(`${stock.code}.T`);
-            results[stock.code] = {
-                price: quote.regularMarketPrice,
-                change: quote.regularMarketChange,
-                changePercent: quote.regularMarketChangePercent,
-                shortName: quote.shortName
-            };
+            if (quote) {
+                results[stock.code] = {
+                    price: quote.regularMarketPrice,
+                    change: quote.regularMarketChange,
+                    changePercent: quote.regularMarketChangePercent,
+                    shortName: quote.shortName
+                };
+            }
         } catch (e) {
-            console.error(`Failed for ${stock.code}`, e.message);
+            console.error(`Failed for ${stock.code}: ${e.message}`);
         }
     }
     return results;
@@ -56,7 +60,7 @@ async function fetchEdinet() {
                 allDocs = [...allDocs, ...res.data.results];
             }
         } catch (e) {
-            console.error(`Failed for EDINET date ${date}`, e.message);
+            console.error(`Failed for EDINET date ${date}: ${e.message}`);
         }
     }
     return allDocs;

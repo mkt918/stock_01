@@ -1,17 +1,50 @@
 {
-    "7203": {
-        "price": 3770,
-        "change": 10,
-        "changePercent": 0.27
-    },
-    "6758": {
-        "price": 2800,
-        "change": -5,
-        "changePercent": -0.18
-    },
-    "9984": {
-        "price": 10300,
-        "change": 50,
-        "changePercent": 0.49
-    }
+  "6758": {
+    "price": 3552,
+    "change": -53,
+    "changePercent": -1.4701803,
+    "shortName": "SONY GROUP CORPORATION"
+  },
+  "7203": {
+    "price": 3774,
+    "change": 69,
+    "changePercent": 1.8623482,
+    "shortName": "TOYOTA MOTOR CORP"
+  },
+  "7267": {
+    "price": 1601,
+    "change": -10,
+    "changePercent": -0.6207324,
+    "shortName": "HONDA MOTOR CO"
+  },
+  "7974": {
+    "price": 8350,
+    "change": -290,
+    "changePercent": -3.3564813,
+    "shortName": "NINTENDO CO LTD"
+  },
+  "8035": {
+    "price": 41990,
+    "change": 690,
+    "changePercent": 1.6707022,
+    "shortName": "TOKYO ELECTRON"
+  },
+  "9432": {
+    "price": 154.6,
+    "change": 1.2000122,
+    "changePercent": 0.7822766,
+    "shortName": "NTT INC"
+  },
+  "9983": {
+    "price": 69150,
+    "change": 850,
+    "changePercent": 1.2445095,
+    "shortName": "FAST RETAILING CO LTD"
+  },
+  "9984": {
+    "price": 4390,
+    "change": -427,
+    "changePercent": -8.864439,
+    "shortName": "SOFTBANK GROUP CORP"
+  }
 }
