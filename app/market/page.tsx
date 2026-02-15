@@ -149,25 +149,28 @@ export default function MarketPage() {
     } as Stock));
 
     const indexList = [
-        { key: '^GSPC', label: 'S&P 500', flag: '🇺🇸' },
-        { key: '^TPX', label: 'TOPIX', flag: '🇯🇵' },
-        { key: '2559.T', label: 'オルカン', flag: '🌍' },
+        { key: '^GSPC', label: 'S&P 500', flag: '🇺🇸', desc: '米国の代表的な500社の株価指数' },
+        { key: '^TPX', label: 'TOPIX', flag: '🇯🇵', desc: '日本の東証全銘柄を対象とした指数' },
+        { key: '2559.T', label: '全世界 (オールカントリー)', flag: '🌍', desc: '先進国・新興国を含む全世界の株式' },
     ];
 
     return (
         <div className="space-y-6">
             {/* 主要指数バー */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {indexList.map(({ key, label, flag }) => {
+                {indexList.map(({ key, label, flag, desc }) => {
                     const idx = indices[key];
                     const up = idx && idx.changePercent >= 0;
                     return (
-                        <Card key={key} className="bg-white border-slate-100 shadow-sm rounded-2xl overflow-hidden">
+                        <Card key={key} className="bg-white border-slate-100 shadow-sm rounded-2xl overflow-hidden group hover:shadow-md transition-shadow">
                             <CardContent className="p-4">
-                                <div className="flex items-center space-x-2 mb-1">
-                                    <Globe className="h-3 w-3 text-slate-400" />
-                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{flag} {label}</span>
+                                <div className="flex justify-between items-start mb-1">
+                                    <div className="flex items-center space-x-1.5">
+                                        <Globe className="h-3 w-3 text-slate-400" />
+                                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{flag} {label}</span>
+                                    </div>
                                 </div>
+                                <p className="text-[10px] text-slate-400 mb-2 font-medium">{desc}</p>
                                 {idx ? (
                                     <div className="flex items-end justify-between">
                                         <span className="text-xl font-black font-mono text-slate-900">

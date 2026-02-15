@@ -21,6 +21,8 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
     const { cash, holdings, buyStock, sellStock } = useGameStore();
     const [loading, setLoading] = useState(false);
 
+    const [isSimulated, setIsSimulated] = useState(false);
+
     useEffect(() => {
         if (isOpen) {
             fetchPrice();
@@ -30,6 +32,7 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
 
     const fetchPrice = async () => {
         setLoading(true);
+        setIsSimulated(false);
         try {
             // Attempt to fetch real-time data from generated JSON with cache busting
             const res = await fetch(`/stock_01/data/stocks.json?t=${new Date().getTime()}`);
@@ -49,10 +52,16 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
         // Fallback: Use the price passed via props (which might be from MarketPage's recent fetch)
         if (stock.price && stock.price > 0) {
             setCurrentPrice(stock.price);
+            // Assuming prop price might be simulated if not from stocks.json, strictly speaking we don't know
+            // But usually MarketPage also uses stocks.json or simulation.
+            // Let's assume if it came from props and not stocks.json, it might be stale or simulated.
+            // But for now, let's mark fallback as simulated to be safe if it's not in the official list.
+            setIsSimulated(true);
         } else {
             // Only simulate if we absolutely have no data
             const priceData = simulatePrice(stock.code, stock.basePrice ?? 1000);
             setCurrentPrice(priceData.price);
+            setIsSimulated(true);
         }
         setLoading(false);
     };
@@ -131,6 +140,14 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
                         </div>
 
                         {/* Price & Holdings Summary */}
+                        {isSimulated && (
+                            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3 text-center">
+                                <p className="text-xs text-amber-700 font-bold">
+                                    ⚠️ この銘柄はリアルタイム価格を取得できません。<br />
+                                    シミュレーション価格が表示されています。
+                                </p>
+                            </div>
+                        )}
                         <div className="grid grid-cols-2 gap-4">
                             <div className="bg-slate-50 p-5 rounded-3xl border border-slate-100 text-center">
                                 <p className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-tight">現在株価</p>

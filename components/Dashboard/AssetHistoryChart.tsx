@@ -8,7 +8,7 @@ import { Eye, EyeOff, Calendar, Layers } from 'lucide-react';
 
 const INDEX_CONFIG = [
     { key: '^GSPC', name: 'S&P 500', color: '#ff4d4d' },
-    { key: '2559.T', name: 'オルカン', color: '#ffa64d' },
+    { key: '2559.T', name: '全世界 (オールカントリー)', color: '#ffa64d' }, // Maxis All Country Equity ETF
     { key: '^TPX', name: 'TOPIX', color: '#4dff88' }
 ];
 

@@ -4,8 +4,12 @@ import json
 import os
 from datetime import datetime
 import time
+import requests
+import pandas as pd
+from bs4 import BeautifulSoup
+import io
 
-# Stock codes from lib/constants.ts
+# Stock codes from lib/constants.ts (Popular Portfolio)
 STOCKS = [
     # 自動車
     '7203.T', '7267.T', '7201.T',
@@ -32,17 +36,93 @@ STOCKS = [
 ]
 
 # Major Indices
-# Keys must match components/Dashboard/AssetHistoryChart.tsx
 INDICES = {
     '^GSPC': {'symbol': '^GSPC', 'name': 'S&P 500'},
-    '2559.T': {'symbol': '2559.T', 'name': 'オルカン'}, # Maxis All Country Equity ETF
+    '2559.T': {'symbol': '2559.T', 'name': '全世界 (オールカントリー)'}, # Maxis All Country Equity ETF
     '^TPX': {'symbol': '1306.T', 'name': 'TOPIX'}      # Using 1306.T (Nomura TOPIX ETF) as proxy
 }
 
 OUTPUT_DIR = 'public/data'
 
+def fetch_jpx_list():
+    """Scrapes JPX website for the list of listed issues."""
+    print("Fetching JPX stock list...")
+    url = "https://www.jpx.co.jp/markets/statistics-equities/misc/01.html"
+    try:
+        res = requests.get(url)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.content, 'html.parser')
+        
+        # Find link to data_j.xls
+        excel_link = None
+        for a in soup.find_all('a', href=True):
+            if 'data_j.xls' in a['href']:
+                excel_link = a['href']
+                break
+        
+        if not excel_link:
+            print("Could not find data_j.xls link.")
+            return []
+
+        # Handle relative URL
+        if not excel_link.startswith('http'):
+            excel_link = f"https://www.jpx.co.jp{excel_link}"
+            
+        print(f"Downloading Excel from {excel_link}...")
+        excel_res = requests.get(excel_link)
+        excel_res.raise_for_status()
+        
+        # Read Excel
+        # data_j.xls format: code, name, market, ...
+        # Need to handle potential header rows
+        df = pd.read_excel(io.BytesIO(excel_res.content))
+        
+        # Verify columns (Code is usually 2nd col, Name 3rd?)
+        # 2024 format: Date, Code, Name, Market, ...
+        # Let's inspect first few rows logic if headers vary
+        # Actually standard pd.read_excel should pick up headers if they are in row 0
+        
+        stock_list = []
+        for index, row in df.iterrows():
+            try:
+                code_raw = str(row.iloc[1]) # Assuming Code is 2nd column
+                name = str(row.iloc[2])     # Assuming Name is 3rd column
+                
+                # Basic validation for code (4 digits)
+                if len(code_raw) == 4 and code_raw.isdigit():
+                    stock_list.append({"code": code_raw, "name": name})
+            except:
+                continue
+                
+        print(f"Found {len(stock_list)} stocks from JPX.")
+        return stock_list
+        
+    except Exception as e:
+        print(f"Error fetching JPX list: {e}")
+        return []
+
+def create_search_index(stock_list):
+    """Creates search index from stock list (without fetching prices to save time)."""
+    print("Creating search index (Code & Name only)...")
+    results = []
+    
+    for s in stock_list:
+        code = s['code']
+        name = s['name']
+        
+        results.append({
+            "code": code,
+            "name": name,
+            "shortName": name, # Simplification
+            "price": None # Price will be fetched on demand or simulated
+        })
+            
+    print(f"Created index for {len(results)} stocks.")
+    return results
+
 def fetch_stock_data():
-    print("Fetching stock data...")
+    """Fetches data for Popular Stocks (Detailed)."""
+    print("Fetching popular stock data...")
     data = {}
     
     # Batch fetch for efficiency
@@ -77,7 +157,6 @@ def fetch_stock_data():
                     "changePercent": change_percent,
                     "updatedAt": datetime.now().isoformat()
                 }
-                # print(f"Fetched {code}: {price}")
             except Exception as e:
                 print(f"Error fetching {code}: {e}")
                 
@@ -87,6 +166,7 @@ def fetch_stock_data():
     return data
 
 def fetch_index_data():
+    """Fetches data for Major Indices."""
     print("Fetching index data...")
     data = {}
     
@@ -130,13 +210,23 @@ def main():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
         
+    # 1. Popular Stocks
     stocks = fetch_stock_data()
     with open(f'{OUTPUT_DIR}/stocks.json', 'w', encoding='utf-8') as f:
         json.dump(stocks, f, indent=2, ensure_ascii=False)
         
+    # 2. Indices
     indices = fetch_index_data()
     with open(f'{OUTPUT_DIR}/indices.json', 'w', encoding='utf-8') as f:
         json.dump(indices, f, indent=2, ensure_ascii=False)
+        
+    # 3. All Stocks (Search Index) - Light ver.
+    # Only run if we can get the list
+    jpx_list = fetch_jpx_list()
+    if jpx_list:
+        search_index = create_search_index(jpx_list)
+        with open(f'{OUTPUT_DIR}/search-index.json', 'w', encoding='utf-8') as f:
+            json.dump(search_index, f, indent=2, ensure_ascii=False)
         
     print("Market data updated successfully.")
 
