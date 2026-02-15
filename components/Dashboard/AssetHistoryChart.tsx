@@ -45,15 +45,32 @@ export function AssetHistoryChart() {
             filtered = Object.values(weeklyMap).sort((a, b) => a.date.localeCompare(b.date));
         }
 
-        // Find initial index values for normalization
+        // 基準日: 2026年2月16日
+        const BENCHMARK_BASE_DATE = new Date('2026-02-16T00:00:00+09:00');
+
+        // Find the base entry for normalization
+        // We look for the first entry that is ON or AFTER the base date.
+        // If all entries are before base date (unlikely given it's today), use the last one.
+        // If all entries are after (future), use the first one.
+        let baseEntry = filtered.find(d => new Date(d.date) >= BENCHMARK_BASE_DATE);
+
+        if (!baseEntry) {
+            // Case: All history is OLDER than base date (not possible if starting today) 
+            // OR All history is NEWER? No, find returns first match.
+            // If undefined, it means NO entry is >= base date. All are older.
+            // In that case, we should probably use the LATEST entry as a proxy, or just wait.
+            // But for robustness, let's use the first available entry if we can't find a match,
+            // or maybe the logic is: "Compare against 10M investment on Feb 16".
+            // If we have data on Feb 16, use it.
+            baseEntry = filtered[0];
+        }
+
         const initialIndexValues: Record<string, number> = {};
-        filtered.forEach(entry => {
-            if (entry.indexPrices) {
-                Object.keys(entry.indexPrices).forEach(key => {
-                    if (!initialIndexValues[key]) initialIndexValues[key] = entry.indexPrices![key];
-                });
-            }
-        });
+        if (baseEntry && baseEntry.indexPrices) {
+            Object.keys(baseEntry.indexPrices).forEach(key => {
+                initialIndexValues[key] = baseEntry.indexPrices![key];
+            });
+        }
 
         return filtered.map(d => {
             const entry: any = {
@@ -63,9 +80,12 @@ export function AssetHistoryChart() {
             };
 
             // Calculate simulation values for indices (10M * current / initial)
+            // Fixed investment amount: 10,000,000 JPY
+            const SIMULATION_AMOUNT = 10000000;
+
             INDEX_CONFIG.forEach(idx => {
                 if (d.indexPrices && d.indexPrices[idx.key] && initialIndexValues[idx.key]) {
-                    entry[idx.key] = initialCapital * (d.indexPrices[idx.key] / initialIndexValues[idx.key]);
+                    entry[idx.key] = SIMULATION_AMOUNT * (d.indexPrices[idx.key] / initialIndexValues[idx.key]);
                 }
             });
 
@@ -183,7 +203,7 @@ export function AssetHistoryChart() {
                     </ResponsiveContainer>
                 </div>
                 <div className="mt-4 text-[10px] text-slate-400 italic text-center">
-                    ※ 指数ラインは1000万円を基準日に一括購入したと仮定したシミュレーションです。
+                    ※ 指数ラインは、基準日（2026年2月16日）に1,000万円を一括投資した場合のシミュレーション推移です。
                 </div>
             </CardContent>
         </Card>
