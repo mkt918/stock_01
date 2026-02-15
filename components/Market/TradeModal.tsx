@@ -30,10 +30,30 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
 
     const fetchPrice = async () => {
         setLoading(true);
-        // Simulate local network delay
-        await new Promise(resolve => setTimeout(resolve, 300));
-        const priceData = simulatePrice(stock.code, stock.basePrice ?? 1000);
-        setCurrentPrice(priceData.price);
+        try {
+            // Attempt to fetch real-time data from generated JSON with cache busting
+            const res = await fetch(`/stock_01/data/stocks.json?t=${new Date().getTime()}`);
+            if (res.ok) {
+                const data = await res.json();
+                const stockData = data[stock.code];
+                if (stockData && stockData.price) {
+                    setCurrentPrice(stockData.price);
+                    setLoading(false);
+                    return;
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch fresh price:", error);
+        }
+
+        // Fallback: Use the price passed via props (which might be from MarketPage's recent fetch)
+        if (stock.price && stock.price > 0) {
+            setCurrentPrice(stock.price);
+        } else {
+            // Only simulate if we absolutely have no data
+            const priceData = simulatePrice(stock.code, stock.basePrice ?? 1000);
+            setCurrentPrice(priceData.price);
+        }
         setLoading(false);
     };
 
