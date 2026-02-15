@@ -66,7 +66,14 @@ export default function MarketPage() {
             <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-900">株式市場</h1>
-                    <p className="text-slate-500">リアルタイムでの取引が可能です (日本株のみ)</p>
+                    <div className="flex items-center space-x-2">
+                        <p className="text-slate-500 text-sm">リアルタイムでの取引が可能です (日本株のみ)</p>
+                        {lastUpdated && (
+                            <span className="text-[10px] bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full">
+                                最終同期: {lastUpdated.toLocaleTimeString()}
+                            </span>
+                        )}
+                    </div>
                 </div>
                 <div className="flex items-center space-x-2 w-full md:w-auto">
                     <div className="relative flex-1 md:w-64">
