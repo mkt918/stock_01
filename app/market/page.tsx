@@ -115,11 +115,12 @@ export default function MarketPage() {
                                     </p>
                                 </div>
                                 <div className={`text-right ${stock.change && stock.change >= 0 ? 'text-red-500' : 'text-green-500'}`}>
+                                    <p className="text-[10px] font-bold uppercase tracking-tight mb-1 opacity-70">前日比</p>
                                     <div className="flex items-center justify-end space-x-1">
-                                        {stock.change && stock.change >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                                        <span className="font-bold">{stock.changePercent}%</span>
+                                        {stock.change && stock.change >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                                        <span className="font-bold text-sm">{stock.changePercent ? stock.changePercent.toFixed(2) : '0.00'}%</span>
                                     </div>
-                                    <p className="text-xs">
+                                    <p className="text-xs font-mono font-medium">
                                         {stock.change && stock.change > 0 ? '+' : ''}{stock.change}
                                     </p>
                                 </div>
