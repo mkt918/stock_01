@@ -1,23 +1,23 @@
 {
   "^GSPC": {
     "name": "S&P 500",
-    "price": 5667.20,
-    "change": 23.11,
-    "changePercent": 0.4093,
-    "currency": "USD"
+    "price": 6836.169921875,
+    "change": 3.4099218749997817,
+    "changePercent": 0.04990548292344209,
+    "updatedAt": "2026-02-15T21:19:22.979633"
+  },
+  "2559.T": {
+    "name": "オルカン",
+    "price": 26175.0,
+    "change": -475.0,
+    "changePercent": -1.7823639774859286,
+    "updatedAt": "2026-02-15T21:19:23.508717"
   },
   "^TPX": {
     "name": "TOPIX",
-    "price": 2808.29,
-    "change": -12.43,
-    "changePercent": -0.4409,
-    "currency": "JPY"
-  },
-  "2559.T": {
-    "name": "全世界株式(オルカン)",
-    "price": 21830.0,
-    "change": 120.0,
-    "changePercent": 0.5523,
-    "currency": "JPY"
+    "price": 4012.0,
+    "change": -59.0,
+    "changePercent": -1.4492753623188406,
+    "updatedAt": "2026-02-15T21:19:24.285730"
   }
 }
