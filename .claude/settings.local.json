@@ -9,7 +9,17 @@
       "WebFetch(domain:www.geeksforgeeks.org)",
       "WebFetch(domain:medium.com)",
       "WebFetch(domain:www.interactivebrokers.com)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(npx vitest run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(git stash:*)",
+      "Bash(node --experimental-vm-modules node_modules/.bin/vitest run:*)",
+      "Bash(npx tsx:*)",
+      "Bash(python:*)",
+      "Bash(node -e:*)",
+      "Bash(npx vitest:*)",
+      "Bash(echo:*)",
+      "Bash(git push:*)"
     ]
   }
 }
