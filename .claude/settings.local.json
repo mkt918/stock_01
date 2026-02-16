@@ -19,7 +19,16 @@
       "Bash(node -e:*)",
       "Bash(npx vitest:*)",
       "Bash(echo:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)",
+      "Bash(git fetch:*)"
     ]
   }
 }
