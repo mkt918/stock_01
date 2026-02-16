@@ -15,7 +15,7 @@ export default function Dashboard() {
     const { holdings, resetGame } = useGameStore();
     const [mounted, setMounted] = useState(false);
 
-    const { lastUpdated, isRefreshing, indices, handleRefresh } = useAutoRefresh(60000);
+    const { lastUpdated, isRefreshing, indices, handleRefresh } = useAutoRefresh();
     const { cash, totalAssets, profit, profitPercent } = useAssetSummary();
 
     useEffect(() => {

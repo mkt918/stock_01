@@ -174,7 +174,15 @@ export const useGameStore = create<GameState>()(
                         return item;
                     });
 
-                    if (updated || Object.keys(indexData).length > 0) {
+                    // 資産履歴の記録は当日17時以降かつ今日まだ記録していない場合のみ
+                    const now = new Date();
+                    const isAfter17 = now.getHours() >= 17;
+                    const todayStr = now.toISOString().split('T')[0];
+                    const alreadyRecordedToday = assetHistory.some(entry =>
+                        entry.date.startsWith(todayStr)
+                    );
+
+                    if ((updated || Object.keys(indexData).length > 0) && isAfter17 && !alreadyRecordedToday) {
                         const stockValue = newHoldings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
                         const { cash } = get();
                         const totalAssets = cash + stockValue;
@@ -185,7 +193,7 @@ export const useGameStore = create<GameState>()(
                         });
 
                         const newEntry: AssetHistory = {
-                            date: new Date().toISOString(),
+                            date: now.toISOString(),
                             totalAssets,
                             cash,
                             stockValue,
@@ -196,6 +204,9 @@ export const useGameStore = create<GameState>()(
                             holdings: newHoldings,
                             assetHistory: [...assetHistory, newEntry]
                         });
+                    } else if (updated) {
+                        // 17時前・記録済みの場合でも保有株の価格は更新する
+                        set({ holdings: newHoldings });
                     }
                 } catch (error) {
                     console.error("Failed to update prices/indices:", error);

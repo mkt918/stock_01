@@ -10,7 +10,7 @@ interface AutoRefreshResult {
     handleRefresh: () => Promise<void>;
 }
 
-export function useAutoRefresh(intervalMs: number = 60000): AutoRefreshResult {
+export function useAutoRefresh(intervalMs: number = 300000): AutoRefreshResult {
     const updatePrices = useGameStore((s) => s.updatePrices);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
