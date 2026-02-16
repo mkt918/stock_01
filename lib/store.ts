@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { Stock, PortfolioItem, Transaction, AssetHistory } from './types';
+import { Stock, PortfolioItem, Transaction, AssetHistory, DividendInfo } from './types';
 import { toast } from '@/hooks/useToast';
 
 interface GameState {
@@ -147,13 +147,14 @@ export const useGameStore = create<GameState>()(
 
                 try {
                     const stockRes = await fetch(`/stock_01/data/stocks.json?t=${new Date().getTime()}`);
-                    let stockData: Record<string, { price: number }> = {};
+                    let stockData: Record<string, { price: number; dividend?: DividendInfo }> = {};
                     if (stockRes.ok) {
                         stockData = await stockRes.json();
                     }
 
                     const indexRes = await fetch(`/stock_01/data/indices.json?t=${new Date().getTime()}`);
                     let indexData: Record<string, { price: number }> = {};
+
                     if (indexRes.ok) {
                         indexData = await indexRes.json();
                     }
@@ -161,17 +162,12 @@ export const useGameStore = create<GameState>()(
                     let updated = false;
                     const newHoldings = holdings.map(item => {
                         if (stockData[item.code]) {
+                            updated = true;
                             const data = stockData[item.code];
-                            const newPrice = data.price;
-                            // Check if price OR dividend changed
-                            // For simplicity, we update if stockData exists
-                            // We cast to any to avoid strict type checking on stockData structure if defined vaguely above
-                            const dividend = (data as any).dividend;
-
                             return {
                                 ...item,
-                                currentPrice: newPrice,
-                                dividend: dividend
+                                currentPrice: data.price,
+                                dividend: data.dividend
                             };
                         }
                         return item;

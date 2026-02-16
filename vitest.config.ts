@@ -5,6 +5,7 @@ import path from 'path';
 export default defineConfig({
     plugins: [react()],
     test: {
+        pool: 'vmForks',
         environment: 'jsdom',
         globals: true,
         setupFiles: ['./vitest.setup.ts'],

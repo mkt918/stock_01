@@ -35,6 +35,7 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
     const fetchPrice = async () => {
         setLoading(true);
         setIsSimulated(false);
+        let fetched = false;
         try {
             // Attempt to fetch real-time data from generated JSON with cache busting
             const res = await fetch(`/stock_01/data/stocks.json?t=${new Date().getTime()}`);
@@ -48,29 +49,26 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
                     if (stockData.dividend) {
                         setDividendInfo(stockData.dividend);
                     }
-                    setLoading(false);
-                    return;
+                    fetched = true;
                 }
             }
         } catch (error) {
             console.error("Failed to fetch fresh price:", error);
+        } finally {
+            if (!fetched) {
+                // Fallback: Use the price passed via props
+                if (stock.price && stock.price > 0) {
+                    setCurrentPrice(stock.price);
+                    setIsSimulated(true);
+                } else {
+                    // Only simulate if we absolutely have no data
+                    const priceData = simulatePrice(stock.code, stock.basePrice ?? 1000);
+                    setCurrentPrice(priceData.price);
+                    setIsSimulated(true);
+                }
+            }
+            setLoading(false);
         }
-
-        // Fallback: Use the price passed via props (which might be from MarketPage's recent fetch)
-        if (stock.price && stock.price > 0) {
-            setCurrentPrice(stock.price);
-            // Assuming prop price might be simulated if not from stocks.json, strictly speaking we don't know
-            // But usually MarketPage also uses stocks.json or simulation.
-            // Let's assume if it came from props and not stocks.json, it might be stale or simulated.
-            // But for now, let's mark fallback as simulated to be safe if it's not in the official list.
-            setIsSimulated(true);
-        } else {
-            // Only simulate if we absolutely have no data
-            const priceData = simulatePrice(stock.code, stock.basePrice ?? 1000);
-            setCurrentPrice(priceData.price);
-            setIsSimulated(true);
-        }
-        setLoading(false);
     };
 
     if (!isOpen) return null;

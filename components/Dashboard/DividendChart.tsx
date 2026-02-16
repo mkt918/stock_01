@@ -20,7 +20,7 @@ export function DividendChart({ holdings }: DividendChartProps) {
     let totalAnnualDividend = 0;
 
     holdings.forEach(item => {
-        if (item.dividend && item.dividend.payoutMonths) {
+        if (item.dividend && item.dividend.payoutMonths && item.dividend.payoutMonths.length > 0) {
             const annualAmount = item.dividend.rate * item.quantity;
             totalAnnualDividend += annualAmount;
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { useGameStore } from '@/lib/store';
 import { Eye, EyeOff, Calendar, Layers } from 'lucide-react';
@@ -37,7 +37,9 @@ export function AssetHistoryChart() {
                 const date = new Date(entry.date);
                 const day = date.getDay();
                 const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
-                const monday = new Date(date.setDate(diff)).toISOString().split('T')[0];
+                const mondayDate = new Date(date);
+                mondayDate.setDate(diff);
+                const monday = mondayDate.toISOString().split('T')[0];
 
                 // Keep the last entry of the week
                 weeklyMap[monday] = entry;
