@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Stock } from '@/lib/types';
+import { Stock, DividendInfo } from '@/lib/types';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Search, TrendingUp, TrendingDown, RefreshCcw, Globe, ExternalLink } from 'lucide-react';
 import { TradeModal } from '@/components/Market/TradeModal';
@@ -45,7 +45,7 @@ export default function MarketPage() {
     const fetchStocks = async () => {
         setLoading(true);
         try {
-            let staticData: Record<string, { price: number; change: number; changePercent: number }> = {};
+            let staticData: Record<string, { price: number; change: number; changePercent: number; dividend?: DividendInfo }> = {};
             try {
                 const res = await fetch(`/stock_01/data/stocks.json?t=${new Date().getTime()}`);
                 if (res.ok) {
@@ -59,7 +59,7 @@ export default function MarketPage() {
             const stockWithPrices = POPULAR_STOCKS.map((s) => {
                 if (staticData[s.code]) {
                     const d = staticData[s.code];
-                    return { ...s, price: d.price, change: d.change, changePercent: d.changePercent };
+                    return { ...s, price: d.price, change: d.change, changePercent: d.changePercent, dividend: d.dividend };
                 }
                 const simulated = simulatePrice(s.code, s.basePrice ?? 1000);
                 return { ...s, ...simulated };

@@ -48,7 +48,7 @@ export const useGameStore = create<GameState>()(
 
                     newHoldings = newHoldings.map(h =>
                         h.code === stock.code
-                            ? { ...h, quantity: totalQty, averagePrice: newAvgPrice, currentPrice: stock.price! }
+                            ? { ...h, quantity: totalQty, averagePrice: newAvgPrice, currentPrice: stock.price!, dividend: stock.dividend }
                             : h
                     );
                 } else {
@@ -57,7 +57,8 @@ export const useGameStore = create<GameState>()(
                         name: stock.name,
                         quantity,
                         averagePrice: stock.price!,
-                        currentPrice: stock.price!
+                        currentPrice: stock.price!,
+                        dividend: stock.dividend
                     });
                 }
 
