@@ -154,25 +154,48 @@ def fetch_stock_data():
                 # 配当情報の取得 (実績ベースを優先)
                 # trailingAnnualDividendRate: インデックスの過去1年間の配当実績
                 # dividendRate: 直近配当の年換算(予想の場合が多い)
+                # 配当情報の取得 (優先順位: 実績(info) > 予想(info) > 実績(history))
                 dividend_rate = info.get('trailingAnnualDividendRate')
-                if dividend_rate is None:
-                     dividend_rate = info.get('dividendRate', 0)
                 
-                # 利回りの計算 (trailingAnnualDividendYield があればそれを使う)
+                # 実績が採れない、または0の場合は予想を使う
+                if not dividend_rate:
+                     dividend_rate = info.get('dividendRate')
+
+                # それでもダメなら履歴から計算
+                if not dividend_rate:
+                    try:
+                        divs = ticker.dividends
+                        if not divs.empty:
+                            # 直近1年間の配当合計
+                            # yfinanceのtimezone対応
+                            tz = divs.index.tz
+                            now = pd.Timestamp.now(tz=tz)
+                            start_date = now - pd.DateOffset(years=1)
+                            last_year_divs = divs.loc[start_date:now]
+                            if not last_year_divs.empty:
+                                dividend_rate = float(last_year_divs.sum())
+                    except Exception as e:
+                        print(f"Failed to calculate dividend from history for {code}: {e}")
+
+                # Default to 0 if all failed
+                if not dividend_rate:
+                    dividend_rate = 0
+
+                # 利回りの計算
                 dividend_yield = info.get('trailingAnnualDividendYield')
-                if dividend_yield is None:
+                
+                if not dividend_yield:
                     dividend_yield = info.get('dividendYield')
                 
                 if dividend_yield:
-                    dividend_yield = dividend_yield * 100 # yfinance returns decimal (0.03 for 3%)
-                else:
-                    # Calculate manually if yield is missing
-                    if dividend_rate and price:
-                        dividend_yield = (dividend_rate / price) * 100
-                    else:
-                         # Force 0 if rate is 0 or None
-                        dividend_yield = 0
-                        dividend_rate = 0 # Ensure rate is numeric 0 if None
+                    dividend_yield = dividend_yield * 100 # decimal to percent
+                
+                # 利回りが取れていない場合、または計算可能なら再計算して検証
+                if not dividend_yield and dividend_rate > 0 and price and price > 0:
+                    dividend_yield = (dividend_rate / price) * 100
+                    
+                if not dividend_yield:
+                    dividend_yield = 0
 
 
                 # 権利確定月と受取月の推定 (一律ルール: 確定3/9月 -> 受取6/12月)
