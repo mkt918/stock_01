@@ -150,11 +150,11 @@ export function TradeModal({ stock, isOpen, onClose }: TradeModalProps) {
                             <div className="grid grid-cols-3 gap-3">
                                 <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 text-center">
                                     <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">配当利回り</p>
-                                    <p className="text-lg font-black text-emerald-700 font-mono">{dividendInfo.yield}%</p>
+                                    <p className="text-lg font-black text-emerald-700 font-mono">{Number(dividendInfo.yield).toFixed(2)}%</p>
                                 </div>
                                 <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 text-center">
                                     <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">予想配当(年)</p>
-                                    <p className="text-lg font-black text-emerald-700 font-mono">¥{dividendInfo.rate}</p>
+                                    <p className="text-lg font-black text-emerald-700 font-mono">¥{Number(dividendInfo.rate).toFixed(2)}</p>
                                 </div>
                                 <div className="bg-emerald-50 p-3 rounded-2xl border border-emerald-100 text-center">
                                     <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">権利確定月</p>

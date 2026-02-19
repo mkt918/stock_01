@@ -218,9 +218,9 @@ export default function PortfolioPage() {
                                                         <div className="text-[10px] text-slate-400 font-medium">現: ¥{item.currentPrice.toLocaleString()}</div>
                                                     </td>
                                                     <td className="px-6 py-5">
-                                                        <div className="font-mono font-bold text-emerald-600">¥{dividendAmount.toLocaleString()}</div>
+                                                        <div className="font-mono font-bold text-emerald-600">¥{Math.round(dividendAmount).toLocaleString()}</div>
                                                         {item.dividend ? (
-                                                            <div className="text-[10px] text-emerald-500 font-bold">{item.dividend.yield}% / 確定 {item.dividend.vestingMonths.join('・')}月</div>
+                                                            <div className="text-[10px] text-emerald-500 font-bold">{Number(item.dividend.yield).toFixed(2)}% / 確定 {item.dividend.vestingMonths.join('・')}月</div>
                                                         ) : (
                                                             <div className="text-[10px] text-slate-300">-</div>
                                                         )}
