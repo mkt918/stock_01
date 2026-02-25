@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { Stock, PortfolioItem, Transaction, AssetHistory, DividendInfo } from './types';
 import { toast } from '@/hooks/useToast';
+import { simulatePrice } from './simulation';
+import { POPULAR_STOCKS } from './constants';
 
 interface GameState {
     cash: number;
@@ -132,15 +134,26 @@ export const useGameStore = create<GameState>()(
                 const { cash, holdings, assetHistory } = get();
                 const stockValue = holdings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
                 const totalAssets = cash + stockValue;
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
 
                 const newEntry: AssetHistory = {
-                    date: new Date().toISOString(),
+                    date: now.toISOString(),
                     totalAssets,
                     cash,
                     stockValue
                 };
 
-                set({ assetHistory: [...assetHistory, newEntry] });
+                // 当日エントリをupsert（同日に複数回記録されないよう上書き）
+                const existingIndex = assetHistory.findIndex(e => e.date.startsWith(todayStr));
+                if (existingIndex >= 0) {
+                    // 当日分を上書き（indexPricesは既存エントリから引き継ぐ）
+                    const updatedHistory = [...assetHistory];
+                    updatedHistory[existingIndex] = { ...newEntry, indexPrices: assetHistory[existingIndex].indexPrices };
+                    set({ assetHistory: updatedHistory });
+                } else {
+                    set({ assetHistory: [...assetHistory, newEntry] });
+                }
             },
 
             updatePrices: async () => {
@@ -160,10 +173,9 @@ export const useGameStore = create<GameState>()(
                         indexData = await indexRes.json();
                     }
 
-                    let updated = false;
                     const newHoldings = holdings.map(item => {
                         if (stockData[item.code]) {
-                            updated = true;
+                            // 実データで更新
                             const data = stockData[item.code];
                             return {
                                 ...item,
@@ -171,18 +183,20 @@ export const useGameStore = create<GameState>()(
                                 dividend: data.dividend
                             };
                         }
-                        return item;
+                        // フォールバック: stocks.jsonが空の場合はシミュレーション価格を使用
+                        const stockDef = POPULAR_STOCKS.find(s => s.code === item.code);
+                        const base = stockDef?.basePrice ?? item.averagePrice;
+                        return { ...item, currentPrice: simulatePrice(item.code, base).price };
                     });
 
-                    // 資産履歴の記録は当日17時以降かつ今日まだ記録していない場合のみ
+                    // 資産履歴の記録: 当日まだ記録していない場合のみ（時刻制限なし）
                     const now = new Date();
-                    const isAfter17 = now.getHours() >= 17;
                     const todayStr = now.toISOString().split('T')[0];
                     const alreadyRecordedToday = assetHistory.some(entry =>
                         entry.date.startsWith(todayStr)
                     );
 
-                    if ((updated || Object.keys(indexData).length > 0) && isAfter17 && !alreadyRecordedToday) {
+                    if (!alreadyRecordedToday) {
                         const stockValue = newHoldings.reduce((sum, item) => sum + (item.currentPrice * item.quantity), 0);
                         const { cash } = get();
                         const totalAssets = cash + stockValue;
@@ -197,15 +211,16 @@ export const useGameStore = create<GameState>()(
                             totalAssets,
                             cash,
                             stockValue,
-                            indexPrices
+                            // indexPricesが空の場合はエントリに含めない
+                            ...(Object.keys(indexPrices).length > 0 && { indexPrices })
                         };
 
                         set({
                             holdings: newHoldings,
                             assetHistory: [...assetHistory, newEntry]
                         });
-                    } else if (updated) {
-                        // 17時前・記録済みの場合でも保有株の価格は更新する
+                    } else {
+                        // 当日記録済みの場合は価格のみ更新
                         set({ holdings: newHoldings });
                     }
                 } catch (error) {

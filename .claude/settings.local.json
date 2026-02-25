@@ -28,7 +28,9 @@
       "Bash(git diff:*)",
       "Bash(git checkout:*)",
       "Bash(git merge:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(xargs grep -l \"stocks.json\\\\|indices.json\")",
+      "Bash(xargs grep -l \"updatePrices\\\\|recordHistory\")"
     ]
   }
 }

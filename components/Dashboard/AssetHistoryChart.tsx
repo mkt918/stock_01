@@ -47,25 +47,8 @@ export function AssetHistoryChart() {
             filtered = Object.values(weeklyMap).sort((a, b) => a.date.localeCompare(b.date));
         }
 
-        // 基準日: 2026年2月16日
-        const BENCHMARK_BASE_DATE = new Date('2026-02-16T00:00:00+09:00');
-
-        // Find the base entry for normalization
-        // We look for the first entry that is ON or AFTER the base date.
-        // If all entries are before base date (unlikely given it's today), use the last one.
-        // If all entries are after (future), use the first one.
-        let baseEntry = filtered.find(d => new Date(d.date) >= BENCHMARK_BASE_DATE);
-
-        if (!baseEntry) {
-            // Case: All history is OLDER than base date (not possible if starting today) 
-            // OR All history is NEWER? No, find returns first match.
-            // If undefined, it means NO entry is >= base date. All are older.
-            // In that case, we should probably use the LATEST entry as a proxy, or just wait.
-            // But for robustness, let's use the first available entry if we can't find a match,
-            // or maybe the logic is: "Compare against 10M investment on Feb 16".
-            // If we have data on Feb 16, use it.
-            baseEntry = filtered[0];
-        }
+        // 最初のエントリを基準日として指数を正規化する
+        const baseEntry = filtered[0];
 
         const initialIndexValues: Record<string, number> = {};
         if (baseEntry && baseEntry.indexPrices) {
@@ -205,7 +188,7 @@ export function AssetHistoryChart() {
                     </ResponsiveContainer>
                 </div>
                 <div className="mt-4 text-[10px] text-slate-400 italic text-center">
-                    ※ 指数ラインは、基準日（2026年2月16日）に1,000万円を一括投資した場合のシミュレーション推移です。
+                    ※ 指数ラインは、最初の記録日に1,000万円を一括投資した場合のシミュレーション推移です。
                 </div>
             </CardContent>
         </Card>
