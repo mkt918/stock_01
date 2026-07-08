@@ -1,1 +1,776 @@
-{}
+{
+  "7203": {
+    "price": 2915.0,
+    "change": -26.5,
+    "changePercent": -0.9009009009009009,
+    "dividend": {
+      "rate": 95.0,
+      "yield": 3.26,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:49.292356"
+  },
+  "7267": {
+    "price": 1531.0,
+    "change": -40.5,
+    "changePercent": -2.577155583837098,
+    "dividend": {
+      "rate": 70.0,
+      "yield": 4.57,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:49.934376"
+  },
+  "7201": {
+    "price": 314.70001220703125,
+    "change": -7.5999755859375,
+    "changePercent": -2.3580440191699257,
+    "dividend": {
+      "rate": 0,
+      "yield": 0,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:50.417606"
+  },
+  "6758": {
+    "price": 3508.0,
+    "change": 14.0,
+    "changePercent": 0.40068689181453926,
+    "dividend": {
+      "rate": 25.0,
+      "yield": 0.71,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:51.202505"
+  },
+  "6752": {
+    "price": 4422.0,
+    "change": 15.0,
+    "changePercent": 0.3403675970047651,
+    "dividend": {
+      "rate": 40.0,
+      "yield": 0.9,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:52.021361"
+  },
+  "6501": {
+    "price": 4841.0,
+    "change": -97.0,
+    "changePercent": -1.964358039692183,
+    "dividend": {
+      "rate": 50.0,
+      "yield": 1.03,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:52.468523"
+  },
+  "6702": {
+    "price": 3384.0,
+    "change": -26.0,
+    "changePercent": -0.7624633431085044,
+    "dividend": {
+      "rate": 50.0,
+      "yield": 1.48,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:53.146630"
+  },
+  "6701": {
+    "price": 4377.0,
+    "change": 12.0,
+    "changePercent": 0.27491408934707906,
+    "dividend": {
+      "rate": 38.0,
+      "yield": 0.87,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:53.653054"
+  },
+  "7751": {
+    "price": 4325.0,
+    "change": -7.0,
+    "changePercent": -0.16158818097876268,
+    "dividend": {
+      "rate": 160.0,
+      "yield": 3.7,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:54.283562"
+  },
+  "4901": {
+    "price": 3606.0,
+    "change": -51.0,
+    "changePercent": -1.3945857260049221,
+    "dividend": {
+      "rate": 70.0,
+      "yield": 1.94,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:54.732387"
+  },
+  "8035": {
+    "price": 68570.0,
+    "change": -1450.0,
+    "changePercent": -2.0708369037417884,
+    "dividend": {
+      "rate": 628.0,
+      "yield": 0.92,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:55.530103"
+  },
+  "6146": {
+    "price": 69570.0,
+    "change": -2610.0,
+    "changePercent": -3.6159600997506236,
+    "dividend": {
+      "rate": 505.0,
+      "yield": 0.73,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:56.023950"
+  },
+  "6981": {
+    "price": 9347.0,
+    "change": 113.0,
+    "changePercent": 1.2237383582412822,
+    "dividend": {
+      "rate": 65.0,
+      "yield": 0.7,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:56.510848"
+  },
+  "6902": {
+    "price": 1956.5,
+    "change": -31.0,
+    "changePercent": -1.5597484276729559,
+    "dividend": {
+      "rate": 67.0,
+      "yield": 3.42,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:57.162548"
+  },
+  "9984": {
+    "price": 5837.0,
+    "change": 42.0,
+    "changePercent": 0.724762726488352,
+    "dividend": {
+      "rate": 11.0,
+      "yield": 0.19,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:57.900751"
+  },
+  "9432": {
+    "price": 150.0,
+    "change": 1.6999969482421875,
+    "changePercent": 1.1463229354411246,
+    "dividend": {
+      "rate": 5.3,
+      "yield": 3.53,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:58.335137"
+  },
+  "9433": {
+    "price": 2825.0,
+    "change": 49.5,
+    "changePercent": 1.7834624392001441,
+    "dividend": {
+      "rate": 80.0,
+      "yield": 2.83,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:59.107433"
+  },
+  "9434": {
+    "price": 214.39999389648438,
+    "change": 1.899993896484375,
+    "changePercent": 0.8941147748161765,
+    "dividend": {
+      "rate": 8.6,
+      "yield": 4.01,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:14:59.612682"
+  },
+  "8058": {
+    "price": 4506.0,
+    "change": 1.0,
+    "changePercent": 0.022197558268590455,
+    "dividend": {
+      "rate": 110.0,
+      "yield": 2.44,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:01.308406"
+  },
+  "9983": {
+    "price": 88020.0,
+    "change": -30.0,
+    "changePercent": -0.034071550255536626,
+    "dividend": {
+      "rate": 580.0,
+      "yield": 0.66,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:01.757856"
+  },
+  "3382": {
+    "price": 2048.0,
+    "change": -2.5,
+    "changePercent": -0.121921482565228,
+    "dividend": {
+      "rate": 50.0,
+      "yield": 2.44,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:02.618556"
+  },
+  "8267": {
+    "price": 1460.0,
+    "change": -8.0,
+    "changePercent": -0.544959128065395,
+    "dividend": {
+      "rate": 27.0,
+      "yield": 1.85,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:03.195228"
+  },
+  "8316": {
+    "price": 6885.0,
+    "change": 54.0,
+    "changePercent": 0.7905138339920948,
+    "dividend": {
+      "rate": 157.0,
+      "yield": 2.28,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:03.634961"
+  },
+  "8306": {
+    "price": 3463.0,
+    "change": 4.0,
+    "changePercent": 0.11564035848511131,
+    "dividend": {
+      "rate": 86.0,
+      "yield": 2.48,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:04.193976"
+  },
+  "8766": {
+    "price": 7735.0,
+    "change": -3.0,
+    "changePercent": -0.03876970793486689,
+    "dividend": {
+      "rate": 218.0,
+      "yield": 2.82,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:04.648575"
+  },
+  "6861": {
+    "price": 75760.0,
+    "change": -2720.0,
+    "changePercent": -3.4658511722731906,
+    "dividend": {
+      "rate": 550.0,
+      "yield": 0.73,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:05.228259"
+  },
+  "6273": {
+    "price": 71480.0,
+    "change": -1480.0,
+    "changePercent": -2.0285087719298245,
+    "dividend": {
+      "rate": 1000.0,
+      "yield": 1.4,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:05.709824"
+  },
+  "6954": {
+    "price": 6865.0,
+    "change": -187.0,
+    "changePercent": -2.6517300056721496,
+    "dividend": {
+      "rate": 107.09,
+      "yield": 1.56,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:06.217280"
+  },
+  "6367": {
+    "price": 25715.0,
+    "change": -225.0,
+    "changePercent": -0.8673862760215882,
+    "dividend": {
+      "rate": 340.0,
+      "yield": 1.32,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:06.726177"
+  },
+  "6506": {
+    "price": 6776.0,
+    "change": -156.0,
+    "changePercent": -2.2504327755337563,
+    "dividend": {
+      "rate": 68.0,
+      "yield": 1.0,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:07.178008"
+  },
+  "4063": {
+    "price": 7064.0,
+    "change": -129.0,
+    "changePercent": -1.7934102599749757,
+    "dividend": {
+      "rate": 106.0,
+      "yield": 1.5,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:08.056288"
+  },
+  "5401": {
+    "price": 557.2000122070312,
+    "change": -3.20001220703125,
+    "changePercent": -0.5710228528946063,
+    "dividend": {
+      "rate": 72.0,
+      "yield": 12.92,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:08.912813"
+  },
+  "5108": {
+    "price": 3639.0,
+    "change": 8.0,
+    "changePercent": 0.2203249793445332,
+    "dividend": {
+      "rate": 117.5,
+      "yield": 3.23,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:09.456172"
+  },
+  "4502": {
+    "price": 5503.0,
+    "change": 62.0,
+    "changePercent": 1.1394964160999816,
+    "dividend": {
+      "rate": 200.0,
+      "yield": 3.63,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:09.954775"
+  },
+  "4519": {
+    "price": 7477.0,
+    "change": -127.0,
+    "changePercent": -1.6701735928458705,
+    "dividend": {
+      "rate": 213.0,
+      "yield": 2.85,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:10.497308"
+  },
+  "4568": {
+    "price": 2718.5,
+    "change": -2.0,
+    "changePercent": -0.07351589781290203,
+    "dividend": {
+      "rate": 78.0,
+      "yield": 2.87,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:10.976333"
+  },
+  "4543": {
+    "price": 2293.0,
+    "change": -32.0,
+    "changePercent": -1.3763440860215055,
+    "dividend": {
+      "rate": 30.0,
+      "yield": 1.31,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:11.390972"
+  },
+  "6098": {
+    "price": 12330.0,
+    "change": 15.0,
+    "changePercent": 0.12180267965895249,
+    "dividend": {
+      "rate": 25.0,
+      "yield": 0.2,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:11.780545"
+  },
+  "7741": {
+    "price": 24630.0,
+    "change": -1165.0,
+    "changePercent": -4.516379143244815,
+    "dividend": {
+      "rate": 295.0,
+      "yield": 1.2,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:12.312576"
+  },
+  "7974": {
+    "price": 7150.0,
+    "change": 2.0,
+    "changePercent": 0.02797985450475658,
+    "dividend": {
+      "rate": 219.0,
+      "yield": 3.06,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:12.721627"
+  },
+  "4661": {
+    "price": 2621.0,
+    "change": 43.5,
+    "changePercent": 1.687681862269641,
+    "dividend": {
+      "rate": 15.0,
+      "yield": 0.57,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:13.189365"
+  },
+  "4385": {
+    "price": 4650.0,
+    "change": 125.0,
+    "changePercent": 2.7624309392265194,
+    "dividend": {
+      "rate": 0,
+      "yield": 0,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:13.577970"
+  },
+  "2914": {
+    "price": 6266.0,
+    "change": 72.0,
+    "changePercent": 1.162415240555376,
+    "dividend": {
+      "rate": 251.0,
+      "yield": 4.01,
+      "vestingMonths": [
+        3,
+        9
+      ],
+      "payoutMonths": [
+        6,
+        12
+      ]
+    },
+    "updatedAt": "2026-07-08T04:15:14.137320"
+  }
+}
